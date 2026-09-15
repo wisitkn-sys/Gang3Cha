@@ -15,16 +15,25 @@ const stations = window.dashboardData.stations;
 const periodNames = { daily: "รายวัน", weekly: "รายสัปดาห์", monthly: "รายเดือน", range: "ช่วงวันที่เลือก" };
 const statusLabel = (status) => ({ online: "Online", warning: "Warning", down: "Down" }[status] || status);
 const isChecked = (value) => value === true || value === 1 || /^(true|yes|y|1|checked|x|✓)$/i.test(String(value).trim());
+const downColumns = [6, 9, 11, 13, 15];
+const warningColumns = [2, 3, 4, 5, 7, 8, 10, 12, 14];
+const alarmColumns = [...downColumns, ...warningColumns];
 const stationStatusFromOverviewRow = (row) => {
   // Any explicit Down checkbox takes priority.
-  const downColumns = [6, 9, 11, 13, 15];
   if (downColumns.some((index) => isChecked(row[index]))) return "down";
 
   // Other equipment faults, including every "Not stable" checkbox, are Warning.
-  const warningColumns = [2, 3, 4, 5, 7, 8, 10, 12, 14];
   if (warningColumns.some((index) => isChecked(row[index]))) return "warning";
 
   return "online";
+};
+const stationAlarmCountFromOverviewRow = (row) => alarmColumns.filter((index) => isChecked(row[index])).length;
+const stationMetrics = () => {
+  const online = stations.filter((station) => station.status === "online").length;
+  const down = stations.filter((station) => station.status === "down").length;
+  const warning = stations.filter((station) => station.status === "warning").length;
+  const activeAlarms = stations.reduce((sum, station) => sum + Math.max(0, Number(station.alarmCount) || 0), 0);
+  return { online, down, warning, pending: down + warning, activeAlarms, total: stations.length };
 };
 const systemLinks = {
   BSSC: {
@@ -205,14 +214,13 @@ function renderPrintPreviewPageOne() {
   const summary = window.dashboardData?.summary || { averageAvailability: 100, totalDowntime: 0 };
   const availability = data.rows.length ? data.rows.reduce((sum, row) => sum + row.availability, 0) / data.rows.length : summary.averageAvailability;
   const downtime = data.rows.length ? (currentPeriod === "daily" ? Math.max(...data.rows.map((row) => row.downtime)) : data.rows.reduce((sum, row) => sum + row.downtime, 0)) : summary.totalDowntime;
-  const onlineStations = stations.filter((station) => station.status !== "down").length;
-  const issues = stations.filter((station) => station.status !== "online").length;
+  const metrics = stationMetrics();
   const chartImage = $("#availability-chart")?.toDataURL() || "";
   content.innerHTML = '<div class="preview-kpi-grid">' +
     '<div><span>Availability</span><strong>' + Number(availability).toFixed(2) + '%</strong></div>' +
     '<div><span>Downtime</span><strong>' + downtime + ' นาที</strong></div>' +
-    '<div><span>สถานีออนไลน์</span><strong>' + onlineStations + ' / ' + stations.length + '</strong></div>' +
-    '<div><span>รายการต้องติดตาม</span><strong>' + issues + ' จุด</strong></div>' +
+    '<div><span>สถานีออนไลน์</span><strong>' + metrics.online + ' / ' + metrics.total + '</strong></div>' +
+    '<div><span>รายการต้องติดตาม</span><strong>' + metrics.pending + ' จุด</strong></div>' +
     '</div>' +
     '<div class="preview-system-grid">' + systems.map((system) => '<div><strong>' + system.name + '</strong><span class="status-' + system.status + '">' + statusLabel(system.status) + '</span></div>').join("") + '</div>' +
     (chartImage ? '<img class="preview-chart" src="' + chartImage + '" alt="กราฟแนวโน้ม Availability" />' : "");
@@ -234,8 +242,9 @@ function renderPrintPageTwo() {
   const pendingCorrections = $("#print-pending-corrections");
   const followUp = $("#print-follow-up");
   if (!reportDate || !systemStatusGrid || !overallStatus || !pendingCorrections || !followUp) return;
-  const downCount = stations.filter((station) => station.status === "down").length;
-  const warningCount = stations.filter((station) => station.status === "warning").length;
+  const metrics = stationMetrics();
+  const downCount = metrics.down;
+  const warningCount = metrics.warning;
   const systemDownCount = systems.filter((system) => system.status === "down").length;
   ensurePrintImageSlots();
   renderPrintPreviewPageOne();
@@ -284,8 +293,9 @@ function renderStations() {
   $("#station-rows").innerHTML = rows.length ? rows.map((station) => '<tr><td>' + station.code + '</td><td>' + station.name + '</td><td>' + station.device + '</td><td>' + stationCheckedLabel(station) + '</td><td><span class="status-' + station.status + '">' + statusLabel(station.status) + '</span></td></tr>').join("") : '<tr><td colspan="5">ไม่พบสถานีตามเงื่อนไข</td></tr>';
   $("#station-result-count").textContent = rows.length + " สถานี";
 
-  const downCount = stations.filter((station) => station.status === "down").length;
-  const warningCount = stations.filter((station) => station.status === "warning").length;
+  const metrics = stationMetrics();
+  const downCount = metrics.down;
+  const warningCount = metrics.warning;
   if ($("#overall-title") && $("#overall-detail")) {
     if (downCount > 0) {
       $("#overall-title").textContent = "พบสถานีหรืออุปกรณ์ขัดข้อง";
@@ -407,14 +417,19 @@ function renderReport(period) {
   const availability = reportRows.length ? reportRows.reduce((sum, row) => sum + row.availability, 0) / reportRows.length : summary.averageAvailability;
   const downtime = reportRows.length ? (period === "daily" ? Math.max(...reportRows.map((row) => row.downtime)) : reportRows.reduce((sum, row) => sum + row.downtime, 0)) : summary.totalDowntime;
   $("#availability-kpi").innerHTML = availability.toFixed(2) + "<small>%</small>";
-  const onlineStations = stations.filter((station) => station.status !== "down").length;
-  const totalStations = stations.length;
+  const metrics = stationMetrics();
+  const onlineStations = metrics.online;
+  const totalStations = metrics.total;
   if ($("#online-kpi")) {
     $("#online-kpi").textContent = onlineStations;
     const totalLabel = $("#online-kpi").nextElementSibling;
     if (totalLabel) totalLabel.textContent = "/ " + totalStations + " จุด";
   }
-  $("#summary-list").innerHTML = [["Availability", availability.toFixed(2) + "%"], ["สถานีออนไลน์", onlineStations + " / " + totalStations + " จุด"], ["Downtime", downtime + " นาที"], ["Alarm", "0 รายการ"]].map((item) => "<div><dt>" + item[0] + "</dt><dd>" + item[1] + "</dd></div>").join("");
+  $("#pending-kpi").textContent = metrics.pending;
+  $("#pending-kpi-note").textContent = metrics.pending ? "Down + Warning ที่ต้องติดตาม" : "ไม่มีประเด็นคงค้าง";
+  $("#active-alarm-kpi").textContent = metrics.activeAlarms;
+  $("#active-alarm-note").textContent = metrics.activeAlarms ? "นับจากช่อง Alarm ที่ถูก Check" : "ไม่พบ Alarm ที่กำลังทำงาน";
+  $("#summary-list").innerHTML = [["Availability", availability.toFixed(2) + "%"], ["สถานีออนไลน์", onlineStations + " / " + totalStations + " จุด"], ["Downtime", downtime + " นาที"], ["Alarm", metrics.activeAlarms + " รายการ"]].map((item) => "<div><dt>" + item[0] + "</dt><dd>" + item[1] + "</dd></div>").join("");
   $("#chart-legend").textContent = "Availability · SLA 95%";
   $("#report-checklist").innerHTML = ["ตรวจสอบสถานะระบบหลัก", "ตรวจสอบสถานีและอุปกรณ์", "สรุปความพร้อมใช้งานของระบบ และ ข้อบกพร่องรอการแก้ไข", "ยืนยันสถานะแจ้งผู้ใช้งาน"].map((item) => "<li>" + item + "</li>").join("");
   drawChart();
@@ -495,7 +510,7 @@ async function importWorkbook(file) {
       type: gateway ? "gateway" : "base",
       code: displayCode, name: String(row[1]),
       device: gateway ? "Analog Gateway" : "Base Station",
-      checked: "ล่าสุด", status: stationStatusFromOverviewRow(row)
+      checked: "ล่าสุด", status: stationStatusFromOverviewRow(row), alarmCount: stationAlarmCountFromOverviewRow(row)
     };
   });
   if (!importedStations.length || !eventRows.length) throw new Error("ไม่พบข้อมูลสถานีหรือ Event Log ที่รองรับ");
