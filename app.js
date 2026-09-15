@@ -41,16 +41,12 @@ const systemLinks = {
     label: "เปิดระบบ BSSC →"
   },
   "SD-WAN": {
-    url: "https://forthcorporation-my.sharepoint.com/:f:/g/personal/anurak_k_forth_co_th/IgBAPpDdpFDkQJ7hxSTMhMOcASkMaitr9bRvnEdmsTon2RU?e=Lo9tma",
+    url: "https://1.1.178.146:18008/public/dist/iam/platform-web/index.html#/home",
     label: "เปิดระบบ SD-WAN →"
   },
   Microwave: {
-    url: "https://forthcorporation-my.sharepoint.com/:f:/g/personal/anurak_k_forth_co_th/IgBAPpDdpFDkQJ7hxSTMhMOcASkMaitr9bRvnEdmsTon2RU?e=Lo9tma",
+    url: "https://1.1.178.146:31943/nmsnetworkmgrwebsite/v1/webswing/indexforwebswing.html#page=QWN0aW9uJTNEY29tLmh1YXdlaS51MjAwMC51bml0ZWRtZ3IudG9wby5hY3Rpb24uRG9XZWJUb3BvQWN0aW9u",
     label: "เปิดระบบ Microwave →"
-  },
-  Dispatcher: {
-    url: "https://forthcorporation-my.sharepoint.com/:f:/g/personal/anurak_k_forth_co_th/IgBAPpDdpFDkQJ7hxSTMhMOcASkMaitr9bRvnEdmsTon2RU?e=Lo9tma",
-    label: "เปิดระบบ Dispatcher →"
   }
 };
 let currentPeriod = "daily";
@@ -290,7 +286,18 @@ function renderStations() {
   const search = ($("#station-search")?.value || "").trim().toLowerCase();
   const status = $("#station-status")?.value || "all";
   const rows = stations.filter((station) => station.type === type && (status === "all" || station.status === status) && (station.code + " " + station.name).toLowerCase().includes(search));
-  $("#station-rows").innerHTML = rows.length ? rows.map((station) => '<tr><td>' + station.code + '</td><td>' + station.name + '</td><td>' + station.device + '</td><td>' + stationCheckedLabel(station) + '</td><td><span class="status-' + station.status + '">' + statusLabel(station.status) + '</span></td></tr>').join("") : '<tr><td colspan="5">ไม่พบสถานีตามเงื่อนไข</td></tr>';
+  $("#station-rows").innerHTML = rows.length ? rows.map((station) => {
+    const checked = stationCheckedLabel(station);
+    const statusBadge = '<span class="status-' + station.status + '">' + statusLabel(station.status) + '</span>';
+    const stack = (items) => '<div style="display:grid;gap:4px">' + items.map((item) => '<div>' + item + '</div>').join("") + '</div>';
+    return '<tr>' +
+      '<td>' + station.code + '</td>' +
+      '<td>' + station.name + '</td>' +
+      '<td>' + stack(["Microwave", station.device]) + '</td>' +
+      '<td>' + stack([checked, checked]) + '</td>' +
+      '<td>' + stack([statusBadge, statusBadge]) + '</td>' +
+      '</tr>';
+  }).join("") : '<tr><td colspan="5">ไม่พบสถานีตามเงื่อนไข</td></tr>';
   $("#station-result-count").textContent = rows.length + " สถานี";
 
   const metrics = stationMetrics();
