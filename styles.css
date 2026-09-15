@@ -1535,6 +1535,112 @@ footer {
     background: #fff;
   }
 
+  .print-report-overview {
+    margin: 0 0 6px;
+  }
+
+  .print-overview-title-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #cbd6de;
+  }
+
+  .print-overview-title-row h2 {
+    margin: 0;
+    color: #17324b;
+    font-size: 13px !important;
+    line-height: 1.2;
+  }
+
+  .print-overview-subtitle {
+    margin: 2px 0 0;
+    color: #6c8193;
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: .25px;
+  }
+
+  .print-overview-date {
+    margin: 0 0 1px;
+    color: #6c8193;
+    font-size: 8.5px;
+    white-space: nowrap;
+  }
+
+  .print-overview-date strong {
+    color: #17324b;
+  }
+
+  .print-overview-system-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    margin-bottom: 5px;
+  }
+
+  .print-overview-system-card {
+    display: flex;
+    min-height: 27mm;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 5px 6px;
+    border: 1px solid #cbd6de;
+    border-radius: 5px;
+    background: #fff;
+  }
+
+  .print-overview-system-card strong {
+    color: #17324b;
+    font-size: 9px;
+  }
+
+  .print-overview-system-card p {
+    flex: 1 1 auto;
+    margin: 3px 0;
+    color: #6c8193;
+    font-size: 7.5px;
+    line-height: 1.25;
+    white-space: normal;
+  }
+
+  .print-overview-system-card span {
+    font-size: 8px !important;
+    padding: 1px 4px !important;
+  }
+
+  .print-overview-summary {
+    margin-bottom: 6px;
+    border: 1px solid #cbd6de;
+  }
+
+  .print-overview-summary div {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 3px 6px;
+    border-bottom: 1px solid #cbd6de;
+    font-size: 8.5px;
+  }
+
+  .print-overview-summary strong {
+    color: #17324b;
+  }
+
+  .print-overview-summary p {
+    margin: 0;
+    padding: 3px 6px;
+    color: #6c8193;
+    font-size: 8px;
+  }
+
+  .print-content-section-head {
+    margin-top: 4px;
+  }
+
   .print-page-section-head {
     display: flex;
     align-items: end;
@@ -1578,6 +1684,10 @@ footer {
     height: 275mm;
     display: flex;
     flex-direction: column;
+  }
+
+  .print-image-page-frame > .print-report-overview {
+    flex: 0 0 auto;
   }
 
   .print-image-page-head {
@@ -2021,6 +2131,83 @@ footer {
 
 .preview-final-image-sheet .preview-image-grid {
   grid-template-columns: repeat(2, 1fr);
+}
+
+.preview-print-overview {
+  margin: 10px 0 12px;
+}
+
+.preview-print-overview .print-overview-title-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #cbd6de;
+}
+
+.preview-print-overview .print-overview-title-row h2 {
+  margin: 0;
+  color: #17324b;
+  font-size: 15px;
+}
+
+.preview-print-overview .print-overview-subtitle,
+.preview-print-overview .print-overview-date {
+  margin: 3px 0 0;
+  color: #6c8193;
+  font-size: 10px;
+}
+
+.preview-print-overview .print-overview-system-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.preview-print-overview .print-overview-system-card {
+  display: flex;
+  min-height: 94px;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 8px;
+  border: 1px solid #cbd6de;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.preview-print-overview .print-overview-system-card strong {
+  color: #17324b;
+  font-size: 11px;
+}
+
+.preview-print-overview .print-overview-system-card p {
+  flex: 1;
+  margin: 4px 0;
+  color: #6c8193;
+  font-size: 9px;
+}
+
+.preview-print-overview .print-overview-summary {
+  border: 1px solid #cbd6de;
+}
+
+.preview-print-overview .print-overview-summary div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 5px 8px;
+  border-bottom: 1px solid #cbd6de;
+  font-size: 10px;
+}
+
+.preview-print-overview .print-overview-summary p {
+  margin: 0;
+  padding: 5px 8px;
+  color: #6c8193;
+  font-size: 9px;
 }
 
 .preview-action-center {
