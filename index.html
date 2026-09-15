@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#12345b" />
+  <meta name="description" content="แดชบอร์ดสรุปสถานะระบบ DTRS สำหรับรายงานรายวัน รายสัปดาห์ และรายเดือน" />
+  <title>DOPA USO System Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="เมนูหลัก">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div>
+          <strong>DOPA USO</strong>
+          <small>System Dashboard</small>
+        </div>
+      </div>
+
+      <nav class="nav-list">
+        <button class="nav-item active" type="button" aria-current="page">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="4" rx="1" />
+            <rect x="14" y="10" width="7" height="11" rx="1" />
+            <rect x="3" y="13" width="7" height="8" rx="1" />
+          </svg>
+          <span>ภาพรวมระบบ</span>
+        </button>
+        <button class="nav-item" type="button" data-scroll="systems">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M4 17v-5a8 8 0 0 1 16 0v5" />
+            <path d="M2 17h4v4H2zM18 17h4v4h-4z" />
+            <path d="M9 19h6" />
+          </svg>
+          <span>สถานะระบบ</span>
+        </button>
+        <button class="nav-item" type="button" data-scroll="stations">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M12 2v4M8 22h8M10 18h4M12 6l-4 12h8z" />
+            <path d="M5.5 7.5a9 9 0 0 0 0 9M18.5 7.5a9 9 0 0 1 0 9" />
+          </svg>
+          <span>สถานีและอุปกรณ์</span>
+        </button>
+        <button class="nav-item" type="button" data-scroll="report-content">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M5 3h11l3 3v15H5z" />
+            <path d="M16 3v4h4M8 11h8M8 15h8M8 19h5" />
+          </svg>
+          <span>หัวข้อรายงาน</span>
+        </button>
+        <button class="nav-item" id="print-report-nav" type="button">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2M7 14h10v7H7z" />
+          </svg>
+          <span>พิมพ์รายงาน</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-note">
+        <span class="live-dot"></span>
+        <div><strong>ระบบทำงานปกติ</strong><small id="last-updated">อัปเดตข้อมูลล่าสุด</small></div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <!-- Print-only header: logos + project title -->
+      <div class="print-header" aria-hidden="true">
+        <div class="print-logo-box">
+          <img src="./logo/Nbtc.png" alt="สำนักงาน กสทช." class="print-logo-nbtc" />
+        </div>
+        <div class="print-header-center">
+          <div class="print-project-title">
+            การจัดซื้ออุปกรณ์พร้อมดำเนินการติดตั้ง<br>โครงการเพิ่มประสิทธิภาพระบบโครงข่ายสื่อสารด้วยอุปกรณ์ทวนสัญญาณผ่านคลื่นความถี่สูง
+            (SHF)<br>เพื่อสนับสนุนการปฏิบัติราชการและแก้ไขปัญหาให้กับประชาชนในพื้นที่ห่างไกล<br>สัญญาเลขที่ ๘๖๘๐๒๒๘
+            ลงวันที่ ๒๓ กรกฎาคม ๒๕๖๘</div>
+          <div class="print-period-label" id="print-period-label"></div>
+        </div>
+        <div class="print-logo-box">
+          <img src="./logo/EX Forth.png" alt="Forth Corporation" class="print-logo-forth" />
+        </div>
+      </div>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">ระบบศูนย์ควบคุมสถานีแม่ข่าย
+
+          </p>
+          <h1>DOPA USO System Dashboard</h1>
+        </div>
+        <div class="top-actions">
+          <input id="import-file" type="file" accept=".xlsx,.xls" hidden />
+          <input id="print-image-file" type="file" accept="image/*" multiple hidden />
+          <button class="print-button" id="import-button" type="button" aria-label="นำเข้าไฟล์ Excel">
+            <span>นำเข้าไฟล์</span>
+          </button>
+          <label class="select-wrap">
+            <span>ระบบ</span>
+            <select id="system-filter" aria-label="เลือกระบบ">
+              <option value="all">ทุกระบบ</option>
+              <option value="BSSC">BSSC</option>
+              <option value="SD-WAN">SD-WAN</option>
+              <option value="Microwave">Microwave</option>
+              <option value="Dispatcher">Dispatcher</option>
+            </select>
+          </label>
+          <button class="icon-button" id="refresh-button" type="button" aria-label="รีเฟรชข้อมูล" title="รีเฟรชข้อมูล">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M20 6v5h-5M4 18v-5h5" />
+              <path d="M18.5 9A7 7 0 0 0 6 6.5L4 11M5.5 15A7 7 0 0 0 18 17.5l2-4.5" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <section class="period-bar" aria-label="เลือกรอบรายงาน">
+        <div class="segmented" role="tablist" aria-label="ช่วงเวลารายงาน">
+          <button type="button" class="period-tab active" data-period="daily" role="tab"
+            aria-selected="true">รายวัน</button>
+          <button type="button" class="period-tab" data-period="weekly" role="tab"
+            aria-selected="false">รายสัปดาห์</button>
+          <button type="button" class="period-tab" data-period="monthly" role="tab"
+            aria-selected="false">รายเดือน</button>
+        </div>
+        <div class="report-date">
+          <button class="date-picker-button" id="date-picker-button" type="button" aria-label="เปิดตัวเลือกวันที่รายงาน"
+            aria-controls="date-filter">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2zM7 2v4M17 2v4M3 9h18" />
+            </svg>
+          </button>
+          <button class="date-filter" id="date-filter" type="button" aria-label="เลือกวันที่รายงาน"
+            aria-haspopup="dialog" aria-expanded="false">เลือกวันที่</button>
+          <dialog class="calendar-dialog" id="calendar-dialog" aria-labelledby="calendar-month-label">
+            <div class="calendar-head">
+              <button class="calendar-nav" id="calendar-prev" type="button" aria-label="เดือนก่อนหน้า">‹</button>
+              <strong id="calendar-month-label"></strong>
+              <button class="calendar-nav" id="calendar-next" type="button" aria-label="เดือนถัดไป">›</button>
+            </div>
+            <div class="calendar-legend" aria-hidden="true">
+              <span><i class="legend-swatch weekend"></i>วันเสาร์-อาทิตย์</span>
+              <span><i class="legend-swatch selected"></i>ช่วงวันที่เลือก</span>
+            </div>
+            <div class="calendar-weekdays" aria-hidden="true">
+              <span>อาทิตย์</span><span>จันทร์</span><span>อังคาร</span><span>พุธ</span><span>พฤหัส</span><span>ศุกร์</span><span>เสาร์</span>
+            </div>
+            <div class="calendar-grid" id="calendar-grid"></div>
+          </dialog>
+        </div>
+      </section>
+
+      <section class="action-center" aria-live="polite">
+        <div class="action-copy">
+          <div class="action-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="m7 12 3 3 7-7" />
+              <circle cx="12" cy="12" r="9" />
+            </svg>
+          </div>
+          <div>
+            <p>สิ่งที่ต้องดำเนินการ</p>
+            <h2 id="overall-title">ไม่มีรายการที่ต้องดำเนินการ</h2>
+            <span id="overall-detail">ตรวจสอบสถานีและอุปกรณ์ครบ 16 จุด ไม่พบเหตุขัดข้อง</span>
+          </div>
+        </div>
+
+      </section>
+
+      <section class="kpi-grid" aria-label="ตัวชี้วัดสำคัญ">
+        <article class="kpi-card primary">
+          <div class="kpi-head"><span>ความพร้อมใช้งานเฉลี่ย</span><em id="availability-trend">ตาม SLA</em></div>
+          <strong id="availability-kpi">100.00<small>%</small></strong>
+          <div class="mini-progress"><i id="availability-progress"></i></div>
+        </article>
+        <article class="kpi-card">
+          <div class="kpi-head"><span>สถานีออนไลน์</span><em>ทั้งหมด</em></div>
+          <strong><span id="online-kpi">16</span><small>/ 16 จุด</small></strong>
+          <p>Base Station 8 · Analog Gateway 8</p>
+        </article>
+        <article class="kpi-card">
+          <div class="kpi-head"><span>รายการรอแก้ไข</span><em>Pending</em></div>
+          <strong>0<small> รายการ</small></strong>
+          <p>ไม่มีประเด็นคงค้าง</p>
+        </article>
+        <article class="kpi-card">
+          <div class="kpi-head"><span>Alarm ที่กำลังทำงาน</span><em>Active</em></div>
+          <strong>0<small> Alarm</small></strong>
+          <p>ไม่พบ Alarm ที่กระทบบริการ</p>
+        </article>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="panel trend-panel">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">SERVICE AVAILABILITY</p>
+              <h3 id="trend-title">แนวโน้มความพร้อมใช้งาน 31 วัน</h3>
+            </div>
+            <div class="chart-legend" id="chart-legend"></div>
+          </div>
+          <div class="chart-wrap"><canvas id="availability-chart" aria-label="กราฟแนวโน้มความพร้อมใช้งาน"></canvas>
+          </div>
+          <div class="chart-axis"><span>1 ส.ค.</span><span>8 ส.ค.</span><span>15 ส.ค.</span><span>22 ส.ค.</span><span>31
+              ส.ค.</span></div>
+        </article>
+
+        <article class="panel summary-panel">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">REPORT SUMMARY</p>
+              <h3 id="summary-title">สรุปรายงานประจำวัน</h3>
+            </div><span class="verified">ตรวจสอบแล้ว</span>
+          </div>
+          <dl class="summary-list" id="summary-list"></dl>
+          <div class="customer-message">
+            <span>ข้อความแจ้งผู้ใช้งาน</span>
+            <p id="customer-message">ระบบให้บริการตามปกติ ไม่พบเหตุขัดข้อง</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel" id="systems">
+        <div class="panel-header">
+          <div>
+            <p class="panel-kicker">CORE SYSTEMS</p>
+            <h3>สถานะระบบหลัก</h3>
+          </div>
+          <span class="subtle" id="system-count">4 ระบบทำงานปกติ</span>
+        </div>
+        <div class="system-grid" id="system-grid"></div>
+      </section>
+
+      <section class="dashboard-grid lower-grid">
+        <article class="panel stations-panel" id="stations">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">STATION MONITORING</p>
+              <h3>สถานีและอุปกรณ์</h3>
+            </div>
+            <span class="subtle" id="station-result-count">8 สถานี</span>
+          </div>
+          <div class="station-tools">
+            <label class="search-field">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-4-4" />
+              </svg>
+              <input id="station-search" type="search" placeholder="ค้นหารหัสหรือชื่อสถานี" autocomplete="off" />
+            </label>
+            <div class="station-toggle" role="group" aria-label="ประเภทสถานี">
+              <button type="button" class="station-type active" data-type="base">Base Station</button>
+              <button type="button" class="station-type" data-type="gateway">Analog Gateway</button>
+            </div>
+            <label class="status-filter">
+              <span class="sr-only">กรองสถานะ</span>
+              <select id="station-status" aria-label="กรองสถานะสถานี">
+                <option value="all">ทุกสถานะ</option>
+                <option value="online">Online</option>
+                <option value="warning">Warning</option>
+                <option value="down">Down</option>
+              </select>
+            </label>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>รหัส</th>
+                  <th>ชื่อสถานี</th>
+                  <th>อุปกรณ์</th>
+                  <th>ตรวจล่าสุด</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+              <tbody id="station-rows"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel report-panel" id="report-content">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">REPORT CONTENT</p>
+              <h3 id="content-title">หัวข้อรายงานรายวัน</h3>
+            </div>
+          </div>
+          <ol class="report-checklist" id="report-checklist"></ol>
+          <div class="source-note">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 11v6M12 7h.01" />
+            </svg>
+            <p>อ้างอิงโครงสร้างจากไฟล์ <strong id="data-source-name">รายงานประจำวันชุมสาย v2.1.xlsx</strong><br><span
+                id="data-source-range">ข้อมูล Event Log</span></p>
+          </div>
+        </article>
+      </section>
+
+      <section class="print-page-two" id="print-report-page" aria-label="รายงานหน้าที่ 2">
+        <div class="print-header">
+          <div class="print-logo-box"><img src="./logo/Nbtc.png" alt="สำนักงาน กสทช." class="print-logo-nbtc" /></div>
+          <div class="print-header-center">
+            <div class="print-project-title">
+              การจัดซื้ออุปกรณ์พร้อมดำเนินการติดตั้ง<br>โครงการเพิ่มประสิทธิภาพระบบโครงข่ายสื่อสารด้วยอุปกรณ์ทวนสัญญาณผ่านคลื่นความถี่สูง
+              (SHF)<br>เพื่อสนับสนุนการปฏิบัติราชการและแก้ไขปัญหาให้กับประชาชนในพื้นที่ห่างไกล<br>สัญญาเลขที่ ๘๖๘๐๒๒๘
+              ลงวันที่ ๒๓ กรกฎาคม ๒๕๖๘</div>
+            <div class="print-period-label" id="print-period-label-page2"></div>
+          </div>
+          <div class="print-logo-box"><img src="./logo/EX Forth.png" alt="Forth Corporation" class="print-logo-forth" /></div>
+        </div>
+        <div class="print-page-two-head">
+          <div>
+            <p class="panel-kicker">REPORT PAGE 2</p>
+            <h2>ภาพรวมสถานะบริการทั้งระบบ</h2>
+          </div>
+          <p>วันที่รายงาน: <strong id="print-report-date"></strong></p>
+        </div>
+        <p class="print-report-subtitle">/ DAILY SYSTEM STATUS REPORT</p>
+        <div class="print-system-status-grid" id="print-system-status-grid"></div>
+        <div class="print-overall-summary">
+          <div><span>สถานะระบบรวม / Overall system status</span><strong id="print-overall-status"></strong></div>
+          <div><span>รายการรอแก้ไข / Pending corrections</span><strong id="print-pending-corrections"></strong></div>
+          <p id="print-follow-up"></p>
+        </div>
+        <div class="print-image-grid" id="print-image-grid"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <dialog class="system-dialog" id="system-dialog">
+    <div class="dialog-head">
+      <div>
+        <p class="panel-kicker">SYSTEM DETAIL</p>
+        <h2 id="dialog-title">รายละเอียดระบบ</h2>
+      </div>
+      <button class="dialog-close" id="dialog-close" type="button" aria-label="ปิดหน้าต่าง">×</button>
+    </div>
+    <p class="dialog-scope" id="dialog-scope"></p>
+    <div class="dialog-metrics">
+      <div><span>สถานะ</span><strong class="status-ok">ปกติ</strong></div>
+      <div><span>Availability</span><strong id="dialog-availability">100.00%</strong></div>
+      <div><span>Downtime</span><strong id="dialog-downtime">0 นาที</strong></div>
+    </div>
+    <div class="dialog-message"><strong>ข้อความแจ้งผู้ใช้งาน</strong>
+      <p>ให้บริการตามปกติ ไม่พบเหตุขัดข้อง</p>
+      <a class="dialog-system-link" id="dialog-system-link" href="#" target="_blank" rel="noopener noreferrer" hidden>
+        เปิดระบบ BSSC →
+      </a>
+    </div>
+  </dialog>
+  <dialog class="system-dialog lightbox-dialog" id="lightbox-dialog">
+    <div class="dialog-head">
+      <div>
+        <p class="panel-kicker">IMAGE PREVIEW</p>
+        <h2 id="lightbox-title">รูปภาพประกอบรายงาน</h2>
+      </div>
+      <button class="dialog-close" id="lightbox-close" type="button" aria-label="ปิดหน้าต่าง">×</button>
+    </div>
+    <div class="lightbox-body">
+      <img id="lightbox-img" src="" alt="รูปภาพขนาดใหญ่" />
+    </div>
+    <div class="lightbox-actions">
+      <button class="print-button" id="lightbox-replace-btn" type="button">
+        <span>เปลี่ยนรูปภาพ</span>
+      </button>
+      <button class="print-button danger-btn" id="lightbox-remove-btn" type="button">
+        <span>ลบรูปภาพ</span>
+      </button>
+    </div>
+  </dialog>
+  <dialog class="print-preview-modal" id="print-preview-modal" aria-labelledby="preview-modal-title">
+    <div class="modal-top-bar">
+      <div class="modal-title-group">
+        <p class="panel-kicker">PRINT PREVIEW</p>
+        <h2 id="preview-modal-title">ตัวอย่างรายงานก่อนพิมพ์</h2>
+      </div>
+      <div class="modal-action-group">
+        <button class="print-button" id="preview-attach-btn" type="button">
+          <span>แนบรูปภาพ</span>
+        </button>
+        <button class="print-button primary-action" id="preview-print-btn" type="button">
+          <span>พิมพ์รายงาน</span>
+        </button>
+        <button class="dialog-close" id="preview-modal-close" type="button" aria-label="ปิดหน้าต่าง">x</button>
+      </div>
+    </div>
+    <div class="modal-preview-body">
+      <div class="paper-preview-container">
+        <div class="paper-sheet-header"><span>หน้า 1 / Page 1</span><small>รายงานสรุปสถานะระบบ</small></div>
+        <div class="paper-sheet" id="preview-page1-sheet">
+          <div class="print-header" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:6px;margin-bottom:10px;border-bottom:1.5px solid #cbd6de;">
+            <div class="print-logo-box" style="flex:0 0 90px;display:flex;align-items:center;justify-content:center;">
+              <img src="./logo/Nbtc.png" alt="สำนักงาน กสทช." style="max-width:46px;max-height:46px;object-fit:contain;" />
+            </div>
+            <div style="flex:1;text-align:center;">
+              <div style="font-size:10.5px;font-weight:700;color:#17324b;line-height:1.45;">
+                การจัดซื้ออุปกรณ์พร้อมดำเนินการติดตั้ง<br>โครงการเพิ่มประสิทธิภาพระบบโครงข่ายสื่อสารด้วยอุปกรณ์ทวนสัญญาณผ่านคลื่นความถี่สูง
+                (SHF)<br>เพื่อสนับสนุนการปฏิบัติราชการและแก้ไขปัญหาให้กับประชาชนในพื้นที่ห่างไกล<br>สัญญาเลขที่ ๘๖๘๐๒๒๘
+                ลงวันที่ ๒๓ กรกฎาคม ๒๕๖๘
+              </div>
+              <div style="margin-top:3px;font-size:10px;color:#17324b;font-weight:500;" id="print-period-label-modal"></div>
+            </div>
+            <div class="print-logo-box" style="flex:0 0 90px;display:flex;align-items:center;justify-content:center;">
+              <img src="./logo/EX Forth.png" alt="Forth Corporation" style="max-width:90px;max-height:44px;object-fit:contain;" />
+            </div>
+          </div>
+          <div class="preview-page1-content" id="preview-page1-content"></div>
+        </div>
+
+        <div class="paper-sheet-header"><span>หน้า 2 / Page 2</span><small>สถานะบริการ + รูปภาพประกอบ</small></div>
+        <div class="paper-sheet" id="preview-page2-sheet">
+          <div class="print-header" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:6px;margin-bottom:10px;border-bottom:1.5px solid #cbd6de;">
+            <div class="print-logo-box" style="flex:0 0 90px;display:flex;align-items:center;justify-content:center;">
+              <img src="./logo/Nbtc.png" alt="สำนักงาน กสทช." style="max-width:46px;max-height:46px;object-fit:contain;" />
+            </div>
+            <div style="flex:1;text-align:center;">
+              <div style="font-size:10.5px;font-weight:700;color:#17324b;line-height:1.45;">
+                การจัดซื้ออุปกรณ์พร้อมดำเนินการติดตั้ง<br>โครงการเพิ่มประสิทธิภาพระบบโครงข่ายสื่อสารด้วยอุปกรณ์ทวนสัญญาณผ่านคลื่นความถี่สูง
+                (SHF)<br>เพื่อสนับสนุนการปฏิบัติราชการและแก้ไขปัญหาให้กับประชาชนในพื้นที่ห่างไกล<br>สัญญาเลขที่ ๘๖๘๐๒๒๘
+                ลงวันที่ ๒๓ กรกฎาคม ๒๕๖๘
+              </div>
+              <div style="margin-top:3px;font-size:10px;color:#17324b;font-weight:500;" id="modal-report-date-label"></div>
+            </div>
+            <div class="print-logo-box" style="flex:0 0 90px;display:flex;align-items:center;justify-content:center;">
+              <img src="./logo/EX Forth.png" alt="Forth Corporation" style="max-width:90px;max-height:44px;object-fit:contain;" />
+            </div>
+          </div>
+          <div class="paper-sheet-subhead">
+            <p class="panel-kicker">REPORT PAGE 2</p>
+            <h3>ภาพรวมสถานะบริการทั้งระบบ</h3>
+          </div>
+          <p style="font-size:11px;color:#3d586c;margin:0 0 8px;">วันที่รายงาน: <strong id="modal-report-date"></strong></p>
+          <div id="modal-system-status-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px;"></div>
+          <div class="preview-image-section-wrap">
+            <p class="preview-section-title">รูปภาพประกอบรายงาน (Attached Images)</p>
+            <div class="preview-image-grid" id="preview-image-grid"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+  <div class="toast" id="toast" role="status">อัปเดตข้อมูลล่าสุดแล้ว</div>
+  <script src="./data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="./app.js"></script>
+</body>
+
+</html>

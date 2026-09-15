@@ -1,0 +1,15 @@
+# Excel temporary files
+~$*.xlsx
+~$*.xls
+
+# OS generated files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Editor / IDE directories
+.vscode/
+.idea/
+
+# Local logs
+*.log
