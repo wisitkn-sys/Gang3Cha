@@ -278,7 +278,13 @@ function renderPrintPages() {
   if (gatewayBody) gatewayBody.innerHTML = gatewayRows.map(stationRowMarkup).join("");
   if ($("#print-base-count")) $("#print-base-count").textContent = baseRows.length + " สถานี";
   if ($("#print-gateway-count")) $("#print-gateway-count").textContent = gatewayRows.length + " สถานี";
-  if ($("#print-period-label")) $("#print-period-label").textContent = reportDateLabel();
+  const printLabel = reportDateLabel();
+  if ($("#print-period-label")) $("#print-period-label").textContent = printLabel;
+  if ($("#print-period-label-page2")) $("#print-period-label-page2").textContent = printLabel;
+  if ($("#print-period-label-page3")) $("#print-period-label-page3").textContent = printLabel;
+  if ($("#print-period-label-modal")) $("#print-period-label-modal").textContent = printLabel;
+  if ($("#print-period-label-modal-page2")) $("#print-period-label-modal-page2").textContent = printLabel;
+  if ($("#print-period-label-modal-page3")) $("#print-period-label-modal-page3").textContent = printLabel;
   ensurePrintImageSlots();
   renderPrintPreviewPageOne();
   renderPreviewImageGrid();
