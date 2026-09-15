@@ -1503,7 +1503,11 @@ footer {
 
   .print-only-stations th,
   .print-only-stations td {
-    padding: 2.5px 4px !important;
+    padding: 3px 4px !important;
+  }
+
+  .print-only-stations tbody tr {
+    min-height: 10mm;
   }
 
   .station-cell-stack {
@@ -1584,11 +1588,11 @@ footer {
 
   .print-overview-system-card {
     display: flex;
-    min-height: 27mm;
+    min-height: auto;
     flex-direction: column;
     align-items: flex-start;
-    padding: 5px 6px;
-    border: 1px solid #cbd6de;
+    padding: 4px 6px;
+    border: 1px solid #dde5eb;
     border-radius: 5px;
     background: #fff;
   }
@@ -1599,11 +1603,11 @@ footer {
   }
 
   .print-overview-system-card p {
-    flex: 1 1 auto;
-    margin: 3px 0;
+    flex: 0 0 auto;
+    margin: 2px 0 3px;
     color: #6c8193;
     font-size: 7.5px;
-    line-height: 1.25;
+    line-height: 1.2;
     white-space: normal;
   }
 
@@ -1613,8 +1617,10 @@ footer {
   }
 
   .print-overview-summary {
-    margin-bottom: 6px;
-    border: 1px solid #cbd6de;
+    margin-bottom: 5px;
+    border: 1px solid #dde5eb;
+    border-radius: 5px;
+    overflow: hidden;
   }
 
   .print-overview-summary div {
@@ -1622,7 +1628,7 @@ footer {
     justify-content: space-between;
     gap: 10px;
     padding: 3px 6px;
-    border-bottom: 1px solid #cbd6de;
+    border-bottom: 1px solid #dde5eb;
     font-size: 8.5px;
   }
 
@@ -1656,12 +1662,22 @@ footer {
     font-size: 12px !important;
   }
 
+  .print-page-two .print-page-frame {
+    display: flex;
+    flex-direction: column;
+    height: 275mm;
+  }
+
   .print-page-two .table-wrap {
+    flex: 1 1 auto;
+    display: flex;
+    min-height: 0;
     overflow: visible !important;
   }
 
   .print-page-two table {
     width: 100% !important;
+    height: 100% !important;
     min-width: 0 !important;
     font-size: 9px !important;
   }
@@ -1671,13 +1687,15 @@ footer {
   }
 
   .print-page-two tbody tr {
+    height: 12.5%;
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }
 
   .print-page-two th,
   .print-page-two td {
-    padding: 4px 5px !important;
+    padding: 5px 5px !important;
+    vertical-align: middle !important;
   }
 
   .print-image-page-frame {
@@ -2169,11 +2187,11 @@ footer {
 
 .preview-print-overview .print-overview-system-card {
   display: flex;
-  min-height: 94px;
+  min-height: auto;
   flex-direction: column;
   align-items: flex-start;
-  padding: 8px;
-  border: 1px solid #cbd6de;
+  padding: 7px 8px;
+  border: 1px solid #dde5eb;
   border-radius: 8px;
   background: #fff;
 }
@@ -2184,10 +2202,11 @@ footer {
 }
 
 .preview-print-overview .print-overview-system-card p {
-  flex: 1;
-  margin: 4px 0;
+  flex: 0 0 auto;
+  margin: 3px 0 5px;
   color: #6c8193;
   font-size: 9px;
+  line-height: 1.25;
 }
 
 .preview-print-overview .print-overview-summary {
@@ -2255,4 +2274,12 @@ footer {
   padding-bottom: 2px;
   border-bottom: 1px solid #edf1f4;
   font-size: 9px;
+}
+
+.preview-station-table tbody tr {
+  min-height: 38px;
+}
+
+.preview-station-table td {
+  vertical-align: middle;
 }
