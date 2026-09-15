@@ -14,10 +14,10 @@ window.dashboardData = {
     ["BS-261", "BS หนองนกแก้ว"], ["BS-262", "BS ศรีสุขสำราญ"], ["BS-263", "BS คลองป่าหมู"],
     ["BS-264", "BS วัดบางอุดม"], ["BS-265", "BS วังงิ้ว"], ["BS-266", "BS บ้านปางใหม่พัฒนา"],
     ["BS-267", "BS ช่อง"], ["BS-268", "BS คลองพลู"]
-  ].map(([code, name], index) => ({ type: "base", code, name, device: "Base Station", checked: "08:30", status: index < 2 ? "down" : index === 2 ? "warning" : "online", alarmCount: index < 3 ? 1 : 0 })).concat(
+  ].map(([code, name]) => ({ type: "base", code, name, device: "Base Station", checked: "08:30", status: "online" })).concat(
     ["ห้วยกระเจา", "คลองลาน", "เขาสวนกวาง", "เขาคิชฌกูฎ", "ย่านตาขาว", "วังน้ำเขียว", "หัวไทร", "ดงเจริญ"].map((name, index) => ({
       type: "gateway", code: "AGW-" + String(index + 1).padStart(2, "0"), name,
-      device: "Analog Gateway", checked: "08:30", status: "online", alarmCount: 0
+      device: "Analog Gateway", checked: "08:30", status: "online"
     }))
   ),
   summary: { reportDate: "5 กันยายน 2569", averageAvailability: 99.832549, totalDowntime: 299, online100Days: 18, stationsToFollow: 0 },

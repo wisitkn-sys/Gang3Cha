@@ -503,10 +503,10 @@ function renderReport(period) {
     const totalLabel = $("#online-kpi").nextElementSibling;
     if (totalLabel) totalLabel.textContent = "/ " + totalStations + " จุด";
   }
-  $("#pending-kpi").textContent = metrics.pending;
-  $("#pending-kpi-note").textContent = metrics.pending ? "Down + Warning ที่ต้องติดตาม" : "ไม่มีประเด็นคงค้าง";
-  $("#active-alarm-kpi").textContent = metrics.activeAlarms;
-  $("#active-alarm-note").textContent = metrics.activeAlarms ? "นับจากช่อง Alarm ที่ถูก Check" : "ไม่พบ Alarm ที่กำลังทำงาน";
+  if ($("#pending-kpi")) $("#pending-kpi").textContent = metrics.pending;
+  if ($("#pending-kpi-note")) $("#pending-kpi-note").textContent = metrics.pending ? "Down + Warning ที่ต้องติดตาม" : "ไม่มีประเด็นคงค้าง";
+  if ($("#active-alarm-kpi")) $("#active-alarm-kpi").textContent = metrics.activeAlarms;
+  if ($("#active-alarm-note")) $("#active-alarm-note").textContent = metrics.activeAlarms ? "นับจากช่อง Alarm ที่ถูก Check" : "ไม่พบ Alarm ที่กำลังทำงาน";
   $("#summary-list").innerHTML = [["Availability", availability.toFixed(2) + "%"], ["ออนไลน์", onlineStations + " / " + totalStations + " จุด"], ["Downtime", downtime + " นาที"], ["Alarm", metrics.activeAlarms + " รายการ"]].map((item) => "<div><dt>" + item[0] + "</dt><dd>" + item[1] + "</dd></div>").join("");
   $("#chart-legend").textContent = "Availability · SLA 95%";
   $("#report-checklist").innerHTML = ["ตรวจสอบสถานะระบบหลัก", "ตรวจสอบสถานีและอุปกรณ์", "สรุปความพร้อมใช้งานของระบบ และ ข้อบกพร่องรอการแก้ไข", "ยืนยันสถานะแจ้งผู้ใช้งาน"].map((item) => "<li>" + item + "</li>").join("");
