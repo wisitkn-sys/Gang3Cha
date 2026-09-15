@@ -218,14 +218,41 @@ function openPrintPreviewModal() {
 function renderPrintPreviewPageOne() {
   const content = $("#preview-page1-content");
   const gatewayContent = $("#preview-gateway-content");
+  const data = periodData(currentPeriod);
+  const summary = window.dashboardData?.summary || { averageAvailability: 100, totalDowntime: 0 };
+  const availability = data.rows.length ? data.rows.reduce((sum, row) => sum + row.availability, 0) / data.rows.length : summary.averageAvailability;
+  const downtime = data.rows.length ? (currentPeriod === "daily" ? Math.max(...data.rows.map((row) => row.downtime)) : data.rows.reduce((sum, row) => sum + row.downtime, 0)) : summary.totalDowntime;
+  const metrics = stationMetrics();
+  const chartImage = $("#availability-chart")?.toDataURL() || "";
+
   if (content) {
     content.innerHTML =
+      '<div class="preview-action-center"><strong>' + ($("#overall-title")?.textContent || "ไม่มีรายการที่ต้องดำเนินการ") + '</strong><span>' + ($("#overall-detail")?.textContent || "") + '</span></div>' +
+      '<div class="preview-kpi-grid">' +
+        '<div><span>ความพร้อมใช้งานเฉลี่ย</span><strong>' + Number(availability).toFixed(2) + '%</strong></div>' +
+        '<div><span>สถานีออนไลน์</span><strong>' + metrics.online + ' / ' + metrics.total + ' จุด</strong></div>' +
+        '<div><span>รายการรอแก้ไข</span><strong>' + metrics.pending + ' รายการ</strong></div>' +
+        '<div><span>Alarm ที่กำลังทำงาน</span><strong>' + metrics.activeAlarms + ' Alarm</strong></div>' +
+      '</div>' +
+      '<div class="preview-dashboard-grid">' +
+        '<div class="preview-chart-card"><p class="panel-kicker">SERVICE AVAILABILITY</p><h3>แนวโน้มความพร้อมใช้งาน ช่วงวันที่เลือก</h3>' +
+          (chartImage ? '<img class="preview-chart" src="' + chartImage + '" alt="กราฟแนวโน้ม Availability" />' : '') +
+        '</div>' +
+        '<div class="preview-summary-card"><div class="preview-summary-head"><div><p class="panel-kicker">REPORT SUMMARY</p><h3>สรุปรายงานประจำช่วงวันที่เลือก</h3></div><span class="verified">ตรวจสอบแล้ว</span></div>' +
+          '<div class="preview-summary-list">' +
+            '<div><span>Availability</span><strong>' + Number(availability).toFixed(2) + '%</strong></div>' +
+            '<div><span>ออนไลน์</span><strong>' + metrics.online + ' / ' + metrics.total + ' จุด</strong></div>' +
+            '<div><span>Downtime</span><strong>' + downtime + ' นาที</strong></div>' +
+            '<div><span>Alarm</span><strong>' + metrics.activeAlarms + ' รายการ</strong></div>' +
+          '</div></div>' +
+      '</div>' +
       '<div class="preview-system-grid">' +
-      systems.map((system) => '<div><strong>' + system.name + '</strong><span class="status-' + system.status + '">' + statusLabel(system.status) + '</span></div>').join("") +
+        systems.map((system) => '<div><strong>' + system.name + '</strong><span class="status-' + system.status + '">' + statusLabel(system.status) + '</span></div>').join("") +
       '</div>' +
       '<div class="preview-station-section"><p class="panel-kicker">STATION MONITORING</p><h3>Base Station</h3>' +
-      stationTableMarkup("base") + '</div>';
+        stationTableMarkup("base") + '</div>';
   }
+
   if (gatewayContent) {
     gatewayContent.innerHTML =
       '<div class="preview-station-section"><p class="panel-kicker">STATION MONITORING</p><h3>Analog Gateway</h3>' +
