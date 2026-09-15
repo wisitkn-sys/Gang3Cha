@@ -269,6 +269,54 @@ function closeLightbox() {
   currentActiveLightboxSlot = null;
 }
 
+function printOverviewMarkup(pageNumber) {
+  const metrics = stationMetrics();
+  const downCount = metrics.down;
+  const warningCount = metrics.warning;
+  const systemDownCount = systems.filter((system) => system.status === "down").length;
+  const systemWarningCount = systems.filter((system) => system.status === "warning").length;
+  const overallStatus = systemDownCount
+    ? "มีเหตุขัดข้อง / Down"
+    : systemWarningCount
+      ? "ควรตรวจสอบ / Warning"
+      : "ให้บริการตามปกติ / Normal";
+  const pending = downCount + warningCount;
+  const followUp = pending
+    ? "มีรายการที่ต้องติดตาม / Follow-up required"
+    : "ไม่มีรายการที่ต้องติดตาม / No follow-up required";
+  const reportDate = reportDateLabel();
+
+  return '<div class="print-overview-title-row">' +
+      '<div><p class="panel-kicker">REPORT PAGE ' + pageNumber + '</p><h2>ภาพรวมสถานะบริการทั้งระบบ</h2><p class="print-overview-subtitle">/ DAILY SYSTEM STATUS REPORT</p></div>' +
+      '<p class="print-overview-date">วันที่รายงาน: <strong>' + reportDate + '</strong></p>' +
+    '</div>' +
+    '<div class="print-overview-system-grid">' +
+      systems.map((system) =>
+        '<div class="print-overview-system-card">' +
+          '<strong>' + system.name + '</strong>' +
+          '<p>' + system.scope + '</p>' +
+          '<span class="status-' + system.status + '">' +
+            (system.status === "online" ? "ปกติ" : system.status === "warning" ? "ควรตรวจสอบ" : "ขัดข้อง") +
+          '</span>' +
+        '</div>'
+      ).join("") +
+    '</div>' +
+    '<div class="print-overview-summary">' +
+      '<div><span>สถานะระบบรวม / Overall system status</span><strong>' + overallStatus + '</strong></div>' +
+      '<div><span>รายการรอแก้ไข / Pending corrections</span><strong>' + pending + ' รายการ</strong></div>' +
+      '<p>' + followUp + '</p>' +
+    '</div>';
+}
+
+function renderPrintOverviews() {
+  $$("[data-print-overview]").forEach((container) => {
+    container.innerHTML = printOverviewMarkup(container.dataset.printOverview || "");
+  });
+  $$("[data-preview-overview]").forEach((container) => {
+    container.innerHTML = printOverviewMarkup(container.dataset.previewOverview || "");
+  });
+}
+
 function renderPrintPages() {
   const baseRows = stations.filter((station) => station.type === "base");
   const gatewayRows = stations.filter((station) => station.type === "gateway");
@@ -285,6 +333,7 @@ function renderPrintPages() {
   if ($("#print-period-label-modal")) $("#print-period-label-modal").textContent = printLabel;
   if ($("#print-period-label-modal-page2")) $("#print-period-label-modal-page2").textContent = printLabel;
   if ($("#print-period-label-modal-page3")) $("#print-period-label-modal-page3").textContent = printLabel;
+  renderPrintOverviews();
   ensurePrintImageSlots();
   renderPrintPreviewPageOne();
   renderPreviewImageGrid();
