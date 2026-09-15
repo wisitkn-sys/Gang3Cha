@@ -1472,15 +1472,30 @@ footer {
 
   .stations-panel {
     display: block !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
   }
 
   .stations-panel .table-wrap {
+    break-inside: auto !important;
+    page-break-inside: auto !important;
     overflow: visible !important;
   }
 
   .stations-panel table {
     min-width: 0 !important;
     font-size: 10px !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  .stations-panel thead {
+    display: table-header-group !important;
+  }
+
+  .stations-panel tbody tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
 
   .stations-panel th,
