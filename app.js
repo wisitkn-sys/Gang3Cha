@@ -84,6 +84,26 @@ function renderDataSourceName() {
 function stationCheckedLabel(station) {
   return reportDateLabel();
 }
+
+function stationRowMarkup(station) {
+  const checked = stationCheckedLabel(station);
+  const statusBadge = '<span class="status-' + station.status + '">' + statusLabel(station.status) + '</span>';
+  const stack = (items) => '<div class="station-cell-stack">' + items.map((item) => '<div>' + item + '</div>').join("") + '</div>';
+  return '<tr>' +
+    '<td>' + station.code + '</td>' +
+    '<td>' + station.name + '</td>' +
+    '<td>' + stack(["Microwave", station.device]) + '</td>' +
+    '<td>' + stack([checked, checked]) + '</td>' +
+    '<td>' + stack([statusBadge, statusBadge]) + '</td>' +
+    '</tr>';
+}
+
+function stationTableMarkup(type) {
+  const rows = stations.filter((station) => station.type === type);
+  return '<div class="preview-station-table-wrap"><table class="preview-station-table">' +
+    '<thead><tr><th>รหัส</th><th>ชื่อสถานี</th><th>อุปกรณ์</th><th>ตรวจล่าสุด</th><th>สถานะ</th></tr></thead>' +
+    '<tbody>' + rows.map(stationRowMarkup).join("") + '</tbody></table></div>';
+}
 function validPrintImageSource(source) {
   return typeof source === "string" && source.startsWith("data:image/");
 }
@@ -190,36 +210,27 @@ function openLightbox(slotIndex) {
 
 function openPrintPreviewModal() {
   ensurePrintImageSlots();
-  renderPrintPreviewPageOne();
+  renderPrintPages();
   renderPreviewImageGrid();
-  const labelText = reportDateLabel();
-  if ($("#modal-report-date")) $("#modal-report-date").textContent = labelText;
-  if ($("#modal-report-date-label")) $("#modal-report-date-label").textContent = labelText;
-  if ($("#print-period-label-modal")) $("#print-period-label-modal").textContent = labelText;
-  const modalGrid = $("#modal-system-status-grid");
-  if (modalGrid) {
-    modalGrid.innerHTML = systems.map((system) => '<div style="min-height:22mm;padding:6px 8px;border:1px solid #cbd6de;background:#f1f5f7;text-align:center;"><strong style="display:block;margin-bottom:8px;color:#17324b;font-size:10px;">' + system.name + '</strong><span style="display:block;color:#177b7b;font-size:10px;font-weight:600;">' + (system.status === "online" ? "ปกติ / Normal" : system.status === "warning" ? "ควรตรวจสอบ / Warning" : "ขัดข้อง / Down") + '</span></div>').join("");
-  }
   $("#print-preview-modal")?.showModal();
 }
 
 function renderPrintPreviewPageOne() {
   const content = $("#preview-page1-content");
-  if (!content) return;
-  const data = periodData(currentPeriod);
-  const summary = window.dashboardData?.summary || { averageAvailability: 100, totalDowntime: 0 };
-  const availability = data.rows.length ? data.rows.reduce((sum, row) => sum + row.availability, 0) / data.rows.length : summary.averageAvailability;
-  const downtime = data.rows.length ? (currentPeriod === "daily" ? Math.max(...data.rows.map((row) => row.downtime)) : data.rows.reduce((sum, row) => sum + row.downtime, 0)) : summary.totalDowntime;
-  const metrics = stationMetrics();
-  const chartImage = $("#availability-chart")?.toDataURL() || "";
-  content.innerHTML = '<div class="preview-kpi-grid">' +
-    '<div><span>Availability</span><strong>' + Number(availability).toFixed(2) + '%</strong></div>' +
-    '<div><span>Downtime</span><strong>' + downtime + ' นาที</strong></div>' +
-    '<div><span>สถานีออนไลน์</span><strong>' + metrics.online + ' / ' + metrics.total + '</strong></div>' +
-    '<div><span>รายการต้องติดตาม</span><strong>' + metrics.pending + ' จุด</strong></div>' +
-    '</div>' +
-    '<div class="preview-system-grid">' + systems.map((system) => '<div><strong>' + system.name + '</strong><span class="status-' + system.status + '">' + statusLabel(system.status) + '</span></div>').join("") + '</div>' +
-    (chartImage ? '<img class="preview-chart" src="' + chartImage + '" alt="กราฟแนวโน้ม Availability" />' : "");
+  const gatewayContent = $("#preview-gateway-content");
+  if (content) {
+    content.innerHTML =
+      '<div class="preview-system-grid">' +
+      systems.map((system) => '<div><strong>' + system.name + '</strong><span class="status-' + system.status + '">' + statusLabel(system.status) + '</span></div>').join("") +
+      '</div>' +
+      '<div class="preview-station-section"><p class="panel-kicker">STATION MONITORING</p><h3>Base Station</h3>' +
+      stationTableMarkup("base") + '</div>';
+  }
+  if (gatewayContent) {
+    gatewayContent.innerHTML =
+      '<div class="preview-station-section"><p class="panel-kicker">STATION MONITORING</p><h3>Analog Gateway</h3>' +
+      stationTableMarkup("gateway") + '</div>';
+  }
 }
 
 function closePrintPreviewModal() {
@@ -231,30 +242,19 @@ function closeLightbox() {
   currentActiveLightboxSlot = null;
 }
 
-function renderPrintPageTwo() {
-  const reportDate = $("#print-report-date");
-  const systemStatusGrid = $("#print-system-status-grid");
-  const overallStatus = $("#print-overall-status");
-  const pendingCorrections = $("#print-pending-corrections");
-  const followUp = $("#print-follow-up");
-  if (!reportDate || !systemStatusGrid || !overallStatus || !pendingCorrections || !followUp) return;
-  const metrics = stationMetrics();
-  const downCount = metrics.down;
-  const warningCount = metrics.warning;
-  const systemDownCount = systems.filter((system) => system.status === "down").length;
+function renderPrintPages() {
+  const baseRows = stations.filter((station) => station.type === "base");
+  const gatewayRows = stations.filter((station) => station.type === "gateway");
+  const baseBody = $("#print-base-rows");
+  const gatewayBody = $("#print-gateway-rows");
+  if (baseBody) baseBody.innerHTML = baseRows.map(stationRowMarkup).join("");
+  if (gatewayBody) gatewayBody.innerHTML = gatewayRows.map(stationRowMarkup).join("");
+  if ($("#print-base-count")) $("#print-base-count").textContent = baseRows.length + " สถานี";
+  if ($("#print-gateway-count")) $("#print-gateway-count").textContent = gatewayRows.length + " สถานี";
+  if ($("#print-period-label")) $("#print-period-label").textContent = reportDateLabel();
   ensurePrintImageSlots();
   renderPrintPreviewPageOne();
   renderPreviewImageGrid();
-  const labelText = reportDateLabel();
-  reportDate.textContent = labelText;
-  if ($("#modal-report-date")) $("#modal-report-date").textContent = labelText;
-  if ($("#print-period-label")) $("#print-period-label").textContent = labelText;
-  if ($("#print-period-label-page2")) $("#print-period-label-page2").textContent = labelText;
-  if ($("#print-period-label-modal")) $("#print-period-label-modal").textContent = labelText;
-  systemStatusGrid.innerHTML = systems.map((system) => '<div class="print-system-status"><strong>' + system.name + '</strong><span class="status-' + system.status + '">' + (system.status === "online" ? "ปกติ / Normal" : system.status === "warning" ? "ควรตรวจสอบ / Warning" : "ขัดข้อง / Down") + '</span></div>').join("");
-  overallStatus.textContent = systemDownCount ? "มีเหตุขัดข้อง / Down" : systems.some((system) => system.status === "warning") ? "ควรตรวจสอบ / Warning" : "ให้บริการตามปกติ / Normal";
-  pendingCorrections.textContent = (downCount + warningCount) + " รายการ";
-  followUp.textContent = downCount || warningCount ? "มีรายการติดตามในรายละเอียดจุดตรวจสอบ / See Station Details for follow-up" : "ไม่พบรายการที่ต้องติดตาม / No follow-up required";
 }
 
 function periodData(period, system = "all") {
@@ -277,7 +277,7 @@ function renderSystems() {
   const filter = $("#system-filter")?.value || "all";
   const visible = filter === "all" ? systems : systems.filter((system) => system.id === filter);
   $("#system-grid").innerHTML = visible.map((system) => '<button class="system-card" type="button" data-system="' + system.id + '"><h4>' + system.name + '</h4><p>' + system.scope + '</p><span class="status-' + system.status + '">' + (system.status === "online" ? "ปกติ" : "ขัดข้อง") + '</span></button>').join("");
-  $("#system-count").textContent = visible.filter((system) => system.status === "online").length + " ระบบทำงานปกติ";
+  if ($("#system-count")) $("#system-count").textContent = "";
   $$("#system-grid .system-card").forEach((card) => card.addEventListener("click", () => openSystem(card.dataset.system)));
 }
 
@@ -286,18 +286,7 @@ function renderStations() {
   const search = ($("#station-search")?.value || "").trim().toLowerCase();
   const status = $("#station-status")?.value || "all";
   const rows = stations.filter((station) => station.type === type && (status === "all" || station.status === status) && (station.code + " " + station.name).toLowerCase().includes(search));
-  $("#station-rows").innerHTML = rows.length ? rows.map((station) => {
-    const checked = stationCheckedLabel(station);
-    const statusBadge = '<span class="status-' + station.status + '">' + statusLabel(station.status) + '</span>';
-    const stack = (items) => '<div style="display:grid;gap:4px">' + items.map((item) => '<div>' + item + '</div>').join("") + '</div>';
-    return '<tr>' +
-      '<td>' + station.code + '</td>' +
-      '<td>' + station.name + '</td>' +
-      '<td>' + stack(["Microwave", station.device]) + '</td>' +
-      '<td>' + stack([checked, checked]) + '</td>' +
-      '<td>' + stack([statusBadge, statusBadge]) + '</td>' +
-      '</tr>';
-  }).join("") : '<tr><td colspan="5">ไม่พบสถานีตามเงื่อนไข</td></tr>';
+  $("#station-rows").innerHTML = rows.length ? rows.map(stationRowMarkup).join("") : '<tr><td colspan="5">ไม่พบสถานีตามเงื่อนไข</td></tr>';
   $("#station-result-count").textContent = rows.length + " สถานี";
 
   const metrics = stationMetrics();
@@ -331,7 +320,7 @@ function renderDateOptions() {
   renderCalendar();
   renderStations();
   renderDataSourceRange();
-  renderPrintPageTwo();
+  renderPrintPages();
 }
 
 function renderCalendar() {
@@ -415,7 +404,7 @@ function renderReport(period) {
   const printLabel = $("#print-period-label");
   if (printLabel) printLabel.textContent = "ช่วงรายงาน" + reportPeriodName + " (" + pLabel + ")";
   renderDataSourceRange();
-  renderPrintPageTwo();
+  renderPrintPages();
   $("#summary-title").textContent = "สรุปรายงานประจำ" + reportPeriodName;
   $("#trend-title").textContent = "แนวโน้มความพร้อมใช้งาน " + (period === "daily" ? "รายวัน" : period === "weekly" ? "7 วันล่าสุด" : period === "range" ? "ช่วงวันที่เลือก" : "เดือนล่าสุด");
   $("#content-title").textContent = "หัวข้อรายงาน" + reportPeriodName;
@@ -436,18 +425,18 @@ function renderReport(period) {
   $("#pending-kpi-note").textContent = metrics.pending ? "Down + Warning ที่ต้องติดตาม" : "ไม่มีประเด็นคงค้าง";
   $("#active-alarm-kpi").textContent = metrics.activeAlarms;
   $("#active-alarm-note").textContent = metrics.activeAlarms ? "นับจากช่อง Alarm ที่ถูก Check" : "ไม่พบ Alarm ที่กำลังทำงาน";
-  $("#summary-list").innerHTML = [["Availability", availability.toFixed(2) + "%"], ["สถานีออนไลน์", onlineStations + " / " + totalStations + " จุด"], ["Downtime", downtime + " นาที"], ["Alarm", metrics.activeAlarms + " รายการ"]].map((item) => "<div><dt>" + item[0] + "</dt><dd>" + item[1] + "</dd></div>").join("");
+  $("#summary-list").innerHTML = [["Availability", availability.toFixed(2) + "%"], ["ออนไลน์", onlineStations + " / " + totalStations + " จุด"], ["Downtime", downtime + " นาที"], ["Alarm", metrics.activeAlarms + " รายการ"]].map((item) => "<div><dt>" + item[0] + "</dt><dd>" + item[1] + "</dd></div>").join("");
   $("#chart-legend").textContent = "Availability · SLA 95%";
   $("#report-checklist").innerHTML = ["ตรวจสอบสถานะระบบหลัก", "ตรวจสอบสถานีและอุปกรณ์", "สรุปความพร้อมใช้งานของระบบ และ ข้อบกพร่องรอการแก้ไข", "ยืนยันสถานะแจ้งผู้ใช้งาน"].map((item) => "<li>" + item + "</li>").join("");
   drawChart();
   renderPrintPreviewPageOne();
 }
 
-function drawChart() {
+function drawChart(forcedRatio) {
   const canvas = $("#availability-chart");
   if (!canvas) return;
   const context = canvas.getContext("2d");
-  const width = canvas.clientWidth || 600, height = 230, ratio = window.devicePixelRatio || 1;
+  const width = canvas.clientWidth || 600, height = 230, ratio = forcedRatio || window.devicePixelRatio || 1;
   canvas.width = width * ratio; canvas.height = height * ratio; context.scale(ratio, ratio);
   const selected = $("#system-filter")?.value || "all";
   const grouped = periodData(currentPeriod, selected).rows.reduce((result, row) => {
@@ -630,7 +619,12 @@ $("#lightbox-remove-btn")?.addEventListener("click", () => {
     closeLightbox();
   }
 });
+window.addEventListener("beforeprint", () => {
+  renderPrintPages();
+  drawChart(Math.max(3, window.devicePixelRatio || 1));
+});
+window.addEventListener("afterprint", () => drawChart());
 window.addEventListener("resize", () => { drawChart(); if ($("#calendar-dialog")?.open) positionCalendar(); });
 window.addEventListener("scroll", () => { if ($("#calendar-dialog")?.open) positionCalendar(); }, true);
-renderSystems(); renderStations(); renderDateOptions(); renderDataSourceName(); renderDataSourceRange(); renderPrintPageTwo(); renderPreviewImageGrid(); renderReport("daily");
+renderSystems(); renderStations(); renderDateOptions(); renderDataSourceName(); renderDataSourceRange(); renderPrintPages(); renderPreviewImageGrid(); renderReport("daily");
 const _ver = window.dashboardData?.version; if (_ver && $("#app-version")) $("#app-version").textContent = "v" + _ver;
