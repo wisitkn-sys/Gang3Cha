@@ -233,7 +233,7 @@
             <p class="panel-kicker">CORE SYSTEMS</p>
             <h3>สถานะระบบหลัก</h3>
           </div>
-          <span class="subtle" id="system-count">4 ระบบทำงานปกติ</span>
+          <span class="subtle" id="system-count" hidden></span>
         </div>
         <div class="system-grid" id="system-grid"></div>
       </section>
@@ -304,33 +304,50 @@
         </article>
       </section>
 
-      <section class="print-page-two" id="print-report-page" aria-label="รายงานหน้าที่ 2">
-        <div class="print-header">
-          <div class="print-logo-box"><img src="./logo/Nbtc.png" alt="สำนักงาน กสทช." class="print-logo-nbtc" /></div>
-          <div class="print-header-center">
-            <div class="print-project-title">
-              การจัดซื้ออุปกรณ์พร้อมดำเนินการติดตั้ง<br>โครงการเพิ่มประสิทธิภาพระบบโครงข่ายสื่อสารด้วยอุปกรณ์ทวนสัญญาณผ่านคลื่นความถี่สูง
-              (SHF)<br>เพื่อสนับสนุนการปฏิบัติราชการและแก้ไขปัญหาให้กับประชาชนในพื้นที่ห่างไกล<br>สัญญาเลขที่ ๘๖๘๐๒๒๘
-              ลงวันที่ ๒๓ กรกฎาคม ๒๕๖๘</div>
-            <div class="print-period-label" id="print-period-label-page2"></div>
-          </div>
-          <div class="print-logo-box"><img src="./logo/EX Forth.png" alt="Forth Corporation" class="print-logo-forth" /></div>
-        </div>
-        <div class="print-page-two-head">
+      <section class="print-only-stations panel" id="print-base-section" aria-label="สถานี Base Station สำหรับพิมพ์">
+        <div class="panel-header">
           <div>
-            <p class="panel-kicker">REPORT PAGE 2</p>
-            <h2>ภาพรวมสถานะบริการทั้งระบบ</h2>
+            <p class="panel-kicker">STATION MONITORING</p>
+            <h3>สถานีและอุปกรณ์ · Base Station</h3>
           </div>
-          <p>วันที่รายงาน: <strong id="print-report-date"></strong></p>
+          <span class="subtle" id="print-base-count">8 สถานี</span>
         </div>
-        <p class="print-report-subtitle">/ DAILY SYSTEM STATUS REPORT</p>
-        <div class="print-system-status-grid" id="print-system-status-grid"></div>
-        <div class="print-overall-summary">
-          <div><span>สถานะระบบรวม / Overall system status</span><strong id="print-overall-status"></strong></div>
-          <div><span>รายการรอแก้ไข / Pending corrections</span><strong id="print-pending-corrections"></strong></div>
-          <p id="print-follow-up"></p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>รหัส</th><th>ชื่อสถานี</th><th>อุปกรณ์</th><th>ตรวจล่าสุด</th><th>สถานะ</th></tr></thead>
+            <tbody id="print-base-rows"></tbody>
+          </table>
         </div>
-        <div class="print-image-grid" id="print-image-grid"></div>
+      </section>
+
+      <section class="print-page-two" id="print-report-page" aria-label="รายงานหน้าที่ 2">
+        <div class="print-page-frame">
+          <div class="print-page-section-head">
+            <div>
+              <p class="panel-kicker">STATION MONITORING</p>
+              <h2>สถานีและอุปกรณ์ · Analog Gateway</h2>
+            </div>
+            <span class="subtle" id="print-gateway-count">8 สถานี</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>รหัส</th><th>ชื่อสถานี</th><th>อุปกรณ์</th><th>ตรวจล่าสุด</th><th>สถานะ</th></tr></thead>
+              <tbody id="print-gateway-rows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="print-page-three" id="print-image-page" aria-label="รายงานหน้าสุดท้าย">
+        <div class="print-page-frame print-image-page-frame">
+          <div class="print-page-section-head print-image-page-head">
+            <div>
+              <p class="panel-kicker">ATTACHED IMAGES</p>
+              <h2>รูปภาพประกอบรายงาน</h2>
+            </div>
+          </div>
+          <div class="print-image-grid" id="print-image-grid"></div>
+        </div>
       </section>
 
       <footer>ระบบ DTRS · โครงการเพิ่มประสิทธิภาพระบบโครงข่ายสื่อสารด้วยอุปกรณ์ทวนสัญญาณผ่านคลื่นความถี่สูง (SHF) <span
@@ -398,7 +415,7 @@
     </div>
     <div class="modal-preview-body">
       <div class="paper-preview-container">
-        <div class="paper-sheet-header"><span>หน้า 1 / Page 1</span><small>รายงานสรุปสถานะระบบ</small></div>
+        <div class="paper-sheet-header"><span>หน้า 1 / Page 1</span><small>สถานะระบบหลัก + Base Station</small></div>
         <div class="paper-sheet" id="preview-page1-sheet">
           <div class="print-header" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:6px;margin-bottom:10px;border-bottom:1.5px solid #cbd6de;">
             <div class="print-logo-box" style="flex:0 0 90px;display:flex;align-items:center;justify-content:center;">
@@ -419,30 +436,13 @@
           <div class="preview-page1-content" id="preview-page1-content"></div>
         </div>
 
-        <div class="paper-sheet-header"><span>หน้า 2 / Page 2</span><small>สถานะบริการ + รูปภาพประกอบ</small></div>
-        <div class="paper-sheet" id="preview-page2-sheet">
-          <div class="print-header" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:6px;margin-bottom:10px;border-bottom:1.5px solid #cbd6de;">
-            <div class="print-logo-box" style="flex:0 0 90px;display:flex;align-items:center;justify-content:center;">
-              <img src="./logo/Nbtc.png" alt="สำนักงาน กสทช." style="max-width:46px;max-height:46px;object-fit:contain;" />
-            </div>
-            <div style="flex:1;text-align:center;">
-              <div style="font-size:10.5px;font-weight:700;color:#17324b;line-height:1.45;">
-                การจัดซื้ออุปกรณ์พร้อมดำเนินการติดตั้ง<br>โครงการเพิ่มประสิทธิภาพระบบโครงข่ายสื่อสารด้วยอุปกรณ์ทวนสัญญาณผ่านคลื่นความถี่สูง
-                (SHF)<br>เพื่อสนับสนุนการปฏิบัติราชการและแก้ไขปัญหาให้กับประชาชนในพื้นที่ห่างไกล<br>สัญญาเลขที่ ๘๖๘๐๒๒๘
-                ลงวันที่ ๒๓ กรกฎาคม ๒๕๖๘
-              </div>
-              <div style="margin-top:3px;font-size:10px;color:#17324b;font-weight:500;" id="modal-report-date-label"></div>
-            </div>
-            <div class="print-logo-box" style="flex:0 0 90px;display:flex;align-items:center;justify-content:center;">
-              <img src="./logo/EX Forth.png" alt="Forth Corporation" style="max-width:90px;max-height:44px;object-fit:contain;" />
-            </div>
-          </div>
-          <div class="paper-sheet-subhead">
-            <p class="panel-kicker">REPORT PAGE 2</p>
-            <h3>ภาพรวมสถานะบริการทั้งระบบ</h3>
-          </div>
-          <p style="font-size:11px;color:#3d586c;margin:0 0 8px;">วันที่รายงาน: <strong id="modal-report-date"></strong></p>
-          <div id="modal-system-status-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px;"></div>
+        <div class="paper-sheet-header"><span>หน้า 2 / Page 2</span><small>Analog Gateway</small></div>
+        <div class="paper-sheet preview-print-frame" id="preview-page2-sheet">
+          <div id="preview-gateway-content"></div>
+        </div>
+
+        <div class="paper-sheet-header"><span>หน้าสุดท้าย / Final Page</span><small>รูปภาพประกอบรายงาน</small></div>
+        <div class="paper-sheet preview-print-frame preview-final-image-sheet" id="preview-page3-sheet">
           <div class="preview-image-section-wrap">
             <p class="preview-section-title">รูปภาพประกอบรายงาน (Attached Images)</p>
             <div class="preview-image-grid" id="preview-image-grid"></div>
