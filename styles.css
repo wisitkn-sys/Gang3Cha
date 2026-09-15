@@ -1503,15 +1503,26 @@ footer {
 
   .print-only-stations th,
   .print-only-stations td {
-    padding: 3px 4px !important;
+    padding: 4px 4px !important;
+    vertical-align: middle !important;
   }
 
-  .print-only-stations tbody tr {
-    min-height: 10mm;
+  .print-only-stations tbody tr,
+  .print-page-two tbody tr {
+    height: 12mm;
+    min-height: 12mm;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
 
-  .station-cell-stack {
-    gap: 1px !important;
+  .print-only-stations .station-cell-stack,
+  .print-page-two .station-cell-stack {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    height: 8mm !important;
+    min-height: 8mm !important;
+    gap: 0 !important;
   }
 
   .status-ok,
@@ -1677,7 +1688,6 @@ footer {
 
   .print-page-two table {
     width: 100% !important;
-    height: 100% !important;
     min-width: 0 !important;
     font-size: 9px !important;
   }
@@ -1687,14 +1697,15 @@ footer {
   }
 
   .print-page-two tbody tr {
-    height: 12.5%;
+    height: 12mm;
+    min-height: 12mm;
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }
 
   .print-page-two th,
   .print-page-two td {
-    padding: 5px 5px !important;
+    padding: 4px 4px !important;
     vertical-align: middle !important;
   }
 
