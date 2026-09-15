@@ -1482,6 +1482,64 @@ footer {
     break-inside: avoid !important;
   }
 
+  .print-station-frame {
+    height: 136mm !important;
+    min-height: 136mm !important;
+    max-height: 136mm !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+  }
+
+  .print-station-frame-page2 {
+    margin-top: 4px;
+    padding: 5px 7px !important;
+    border: 1px solid #dde5eb !important;
+    border-radius: 7px !important;
+    background: #fff !important;
+  }
+
+  .print-station-frame > .panel-header,
+  .print-station-frame > .print-page-section-head {
+    flex: 0 0 auto;
+  }
+
+  .print-station-frame > .table-wrap {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  .print-station-frame table {
+    width: 100% !important;
+    height: 100% !important;
+    table-layout: fixed !important;
+  }
+
+  .print-station-frame thead {
+    height: 8mm;
+  }
+
+  .print-station-frame tbody tr {
+    height: calc((100% - 8mm) / 8) !important;
+    min-height: 0 !important;
+  }
+
+  .print-station-frame th,
+  .print-station-frame td {
+    vertical-align: middle !important;
+  }
+
+  .print-station-frame .station-cell-stack {
+    height: 10mm !important;
+    min-height: 10mm !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    gap: 0 !important;
+  }
+
   .print-only-stations .panel-header {
     margin-bottom: 3px !important;
   }
@@ -1509,8 +1567,6 @@ footer {
 
   .print-only-stations tbody tr,
   .print-page-two tbody tr {
-    height: 12mm;
-    min-height: 12mm;
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }
@@ -1673,12 +1729,6 @@ footer {
     font-size: 12px !important;
   }
 
-  .print-page-two .print-page-frame {
-    display: flex;
-    flex-direction: column;
-    height: 275mm;
-  }
-
   .print-page-two .table-wrap {
     flex: 1 1 auto;
     display: flex;
@@ -1697,8 +1747,6 @@ footer {
   }
 
   .print-page-two tbody tr {
-    height: 12mm;
-    min-height: 12mm;
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }
@@ -2288,7 +2336,7 @@ footer {
 }
 
 .preview-station-table tbody tr {
-  min-height: 38px;
+  height: 44px;
 }
 
 .preview-station-table td {
