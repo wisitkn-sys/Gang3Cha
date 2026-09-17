@@ -137,41 +137,41 @@ function renderPreviewImageGrid() {
   if (!previewGrid) return;
   ensurePrintImageSlots();
   const labels = ["BSSC", "SD-WAN", "Microwave", "Dispatcher"];
-  
+
   previewGrid.innerHTML = labels.map((label, index) => {
     const imgEl = $("#print-report-image-" + index);
     const hasImage = Boolean(imgEl && imgEl.src && !imgEl.hidden);
-    
+
     return '<div class="preview-image-card" data-slot="' + index + '">' +
       '<button class="preview-card-img-wrap" type="button" data-action="' + (hasImage ? 'view' : 'upload') + '" data-slot="' + index + '">' +
-        (hasImage ?
-          '<img alt="รูปภาพประกอบระบบ ' + label + '" />' +
-          '<div class="preview-card-overlay">' +
-            '<span class="preview-card-zoom-badge">' +
-              '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">' +
-                '<circle cx="11" cy="11" r="8"></circle>' +
-                '<line x1="21" y1="21" x2="16.65" y2="16.65"></line>' +
-                '<line x1="11" y1="8" x2="11" y2="14"></line>' +
-                '<line x1="8" y1="11" x2="14" y2="11"></line>' +
-              '</svg> คลิกเพื่อขยาย</span>' +
-          '</div>' :
-          '<div class="preview-card-placeholder">' +
-            '<svg viewBox="0 0 24 24">' +
-              '<rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke-width="2"></rect>' +
-              '<circle cx="8.5" cy="8.5" r="1.5"></circle>' +
-              '<polyline points="21 15 16 10 5 21"></polyline>' +
-            '</svg>' +
-            '<span>แนบรูปภาพ ' + label + '</span>' +
-          '</div>'
-        ) +
+      (hasImage ?
+        '<img alt="รูปภาพประกอบระบบ ' + label + '" />' +
+        '<div class="preview-card-overlay">' +
+        '<span class="preview-card-zoom-badge">' +
+        '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">' +
+        '<circle cx="11" cy="11" r="8"></circle>' +
+        '<line x1="21" y1="21" x2="16.65" y2="16.65"></line>' +
+        '<line x1="11" y1="8" x2="11" y2="14"></line>' +
+        '<line x1="8" y1="11" x2="14" y2="11"></line>' +
+        '</svg> คลิกเพื่อขยาย</span>' +
+        '</div>' :
+        '<div class="preview-card-placeholder">' +
+        '<svg viewBox="0 0 24 24">' +
+        '<rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke-width="2"></rect>' +
+        '<circle cx="8.5" cy="8.5" r="1.5"></circle>' +
+        '<polyline points="21 15 16 10 5 21"></polyline>' +
+        '</svg>' +
+        '<span>แนบรูปภาพ ' + label + '</span>' +
+        '</div>'
+      ) +
       '</button>' +
       '<div class="preview-card-footer">' +
-        '<span class="preview-card-title">รูปภาพ ' + label + '</span>' +
-        '<span class="preview-card-status ' + (hasImage ? 'has-image' : 'no-image') + '">' +
-          (hasImage ? 'แนบรูปแล้ว' : 'ยังไม่ได้แนบ') +
-        '</span>' +
+      '<span class="preview-card-title">รูปภาพ ' + label + '</span>' +
+      '<span class="preview-card-status ' + (hasImage ? 'has-image' : 'no-image') + '">' +
+      (hasImage ? 'แนบรูปแล้ว' : 'ยังไม่ได้แนบ') +
+      '</span>' +
       '</div>' +
-    '</div>';
+      '</div>';
   }).join("");
   labels.forEach((label, index) => {
     const imgEl = $("#print-report-image-" + index);
@@ -199,9 +199,9 @@ function openLightbox(slotIndex) {
   const dialog = $("#lightbox-dialog");
   const lightboxImg = $("#lightbox-img");
   const lightboxTitle = $("#lightbox-title");
-  
+
   if (!imgEl || !imgEl.src || !dialog || !lightboxImg || !lightboxTitle) return;
-  
+
   currentActiveLightboxSlot = slotIndex;
   lightboxTitle.textContent = "รูปภาพประกอบระบบ " + labels[slotIndex];
   lightboxImg.src = imgEl.src;
@@ -229,28 +229,28 @@ function renderPrintPreviewPageOne() {
     content.innerHTML =
       '<div class="preview-action-center"><strong>' + ($("#overall-title")?.textContent || "ไม่มีรายการที่ต้องดำเนินการ") + '</strong><span>' + ($("#overall-detail")?.textContent || "") + '</span></div>' +
       '<div class="preview-kpi-grid">' +
-        '<div><span>ความพร้อมใช้งานเฉลี่ย</span><strong>' + Number(availability).toFixed(2) + '%</strong></div>' +
-        '<div><span>สถานีออนไลน์</span><strong>' + metrics.online + ' / ' + metrics.total + ' จุด</strong></div>' +
-        '<div><span>รายการรอแก้ไข</span><strong>' + metrics.pending + ' รายการ</strong></div>' +
-        '<div><span>Alarm ที่กำลังทำงาน</span><strong>' + metrics.activeAlarms + ' Alarm</strong></div>' +
+      '<div><span>ความพร้อมใช้งานเฉลี่ย</span><strong>' + Number(availability).toFixed(2) + '%</strong></div>' +
+      '<div><span>สถานีออนไลน์</span><strong>' + metrics.online + ' / ' + metrics.total + ' จุด</strong></div>' +
+      '<div><span>รายการรอแก้ไข</span><strong>' + metrics.pending + ' รายการ</strong></div>' +
+      '<div><span>Alarm ที่กำลังทำงาน</span><strong>' + metrics.activeAlarms + ' Alarm</strong></div>' +
       '</div>' +
       '<div class="preview-dashboard-grid">' +
-        '<div class="preview-chart-card"><p class="panel-kicker">SERVICE AVAILABILITY</p><h3>แนวโน้มความพร้อมใช้งาน ช่วงวันที่เลือก</h3>' +
-          (chartImage ? '<img class="preview-chart" src="' + chartImage + '" alt="กราฟแนวโน้ม Availability" />' : '') +
-        '</div>' +
-        '<div class="preview-summary-card"><div class="preview-summary-head"><div><p class="panel-kicker">REPORT SUMMARY</p><h3>สรุปรายงานประจำช่วงวันที่เลือก</h3></div><span class="verified">ตรวจสอบแล้ว</span></div>' +
-          '<div class="preview-summary-list">' +
-            '<div><span>Availability</span><strong>' + Number(availability).toFixed(2) + '%</strong></div>' +
-            '<div><span>ออนไลน์</span><strong>' + metrics.online + ' / ' + metrics.total + ' จุด</strong></div>' +
-            '<div><span>Downtime</span><strong>' + downtime + ' นาที</strong></div>' +
-            '<div><span>Alarm</span><strong>' + metrics.activeAlarms + ' รายการ</strong></div>' +
-          '</div></div>' +
+      '<div class="preview-chart-card"><p class="panel-kicker">SERVICE AVAILABILITY</p><h3>แนวโน้มความพร้อมใช้งาน ช่วงวันที่เลือก</h3>' +
+      (chartImage ? '<img class="preview-chart" src="' + chartImage + '" alt="กราฟแนวโน้ม Availability" />' : '') +
+      '</div>' +
+      '<div class="preview-summary-card"><div class="preview-summary-head"><div><p class="panel-kicker">REPORT SUMMARY</p><h3>สรุปรายงานประจำช่วงวันที่เลือก</h3></div><span class="verified">ตรวจสอบแล้ว</span></div>' +
+      '<div class="preview-summary-list">' +
+      '<div><span>Availability</span><strong>' + Number(availability).toFixed(2) + '%</strong></div>' +
+      '<div><span>online</span><strong>' + metrics.online + ' / ' + metrics.total + ' จุด</strong></div>' +
+      '<div><span>Downtime</span><strong>' + downtime + ' นาที</strong></div>' +
+      '<div><span>Alarm</span><strong>' + metrics.activeAlarms + ' รายการ</strong></div>' +
+      '</div></div>' +
       '</div>' +
       '<div class="preview-system-grid">' +
-        systems.map((system) => '<div><strong>' + system.name + '</strong><span class="status-' + system.status + '">' + statusLabel(system.status) + '</span></div>').join("") +
+      systems.map((system) => '<div><strong>' + system.name + '</strong><span class="status-' + system.status + '">' + statusLabel(system.status) + '</span></div>').join("") +
       '</div>' +
       '<div class="preview-station-section"><p class="panel-kicker">STATION MONITORING</p><h3>Base Station</h3>' +
-        stationTableMarkup("base") + '</div>';
+      stationTableMarkup("base") + '</div>';
   }
 
   if (gatewayContent) {
@@ -287,24 +287,24 @@ function printOverviewMarkup(pageNumber) {
   const reportDate = reportDateLabel();
 
   return '<div class="print-overview-title-row">' +
-      '<div><p class="panel-kicker">REPORT PAGE ' + pageNumber + '</p><h2>ภาพรวมสถานะบริการทั้งระบบ</h2><p class="print-overview-subtitle">/ DAILY SYSTEM STATUS REPORT</p></div>' +
-      '<p class="print-overview-date">วันที่รายงาน: <strong>' + reportDate + '</strong></p>' +
+    '<div><p class="panel-kicker">REPORT PAGE ' + pageNumber + '</p><h2>ภาพรวมสถานะบริการทั้งระบบ</h2><p class="print-overview-subtitle">/ DAILY SYSTEM STATUS REPORT</p></div>' +
+    '<p class="print-overview-date">วันที่รายงาน: <strong>' + reportDate + '</strong></p>' +
     '</div>' +
     '<div class="print-overview-system-grid">' +
-      systems.map((system) =>
-        '<div class="print-overview-system-card">' +
-          '<strong>' + system.name + '</strong>' +
-          '<p>' + system.scope + '</p>' +
-          '<span class="status-' + system.status + '">' +
-            (system.status === "online" ? "ปกติ" : system.status === "warning" ? "ควรตรวจสอบ" : "ขัดข้อง") +
-          '</span>' +
-        '</div>'
-      ).join("") +
+    systems.map((system) =>
+      '<div class="print-overview-system-card">' +
+      '<strong>' + system.name + '</strong>' +
+      '<p>' + system.scope + '</p>' +
+      '<span class="status-' + system.status + '">' +
+      (system.status === "online" ? "ปกติ" : system.status === "warning" ? "ควรตรวจสอบ" : "ขัดข้อง") +
+      '</span>' +
+      '</div>'
+    ).join("") +
     '</div>' +
     '<div class="print-overview-summary">' +
-      '<div><span>สถานะระบบรวม / Overall system status</span><strong>' + overallStatus + '</strong></div>' +
-      '<div><span>รายการรอแก้ไข / Pending corrections</span><strong>' + pending + ' รายการ</strong></div>' +
-      '<p>' + followUp + '</p>' +
+    '<div><span>สถานะระบบรวม / Overall system status</span><strong>' + overallStatus + '</strong></div>' +
+    '<div><span>รายการรอแก้ไข / Pending corrections</span><strong>' + pending + ' รายการ</strong></div>' +
+    '<p>' + followUp + '</p>' +
     '</div>';
 }
 
@@ -507,7 +507,7 @@ function renderReport(period) {
   if ($("#pending-kpi-note")) $("#pending-kpi-note").textContent = metrics.pending ? "Down + Warning ที่ต้องติดตาม" : "ไม่มีประเด็นคงค้าง";
   if ($("#active-alarm-kpi")) $("#active-alarm-kpi").textContent = metrics.activeAlarms;
   if ($("#active-alarm-note")) $("#active-alarm-note").textContent = metrics.activeAlarms ? "นับจากช่อง Alarm ที่ถูก Check" : "ไม่พบ Alarm ที่กำลังทำงาน";
-  $("#summary-list").innerHTML = [["Availability", availability.toFixed(2) + "%"], ["ออนไลน์", onlineStations + " / " + totalStations + " จุด"], ["Downtime", downtime + " นาที"], ["Alarm", metrics.activeAlarms + " รายการ"]].map((item) => "<div><dt>" + item[0] + "</dt><dd>" + item[1] + "</dd></div>").join("");
+  $("#summary-list").innerHTML = [["Availability", availability.toFixed(2) + "%"], ["online", onlineStations + " / " + totalStations + " จุด"], ["Downtime", downtime + " นาที"], ["Alarm", metrics.activeAlarms + " รายการ"]].map((item) => "<div><dt>" + item[0] + "</dt><dd>" + item[1] + "</dd></div>").join("");
   $("#chart-legend").textContent = "Availability · SLA 95%";
   $("#report-checklist").innerHTML = ["ตรวจสอบสถานะระบบหลัก", "ตรวจสอบสถานีและอุปกรณ์", "สรุปความพร้อมใช้งานของระบบ และ ข้อบกพร่องรอการแก้ไข", "ยืนยันสถานะแจ้งผู้ใช้งาน"].map((item) => "<li>" + item + "</li>").join("");
   drawChart();
@@ -637,20 +637,20 @@ $("#print-image-file")?.addEventListener("change", (event) => {
   ensurePrintImageSlots();
 
   if (currentSlotForUpload !== null) {
-      const slot = currentSlotForUpload;
-      const file = files[0];
-      const reader = new FileReader();
-      reader.addEventListener("load", () => {
-        printImageSources[slot] = String(reader.result);
-        savePrintImages();
-        const image = $("#print-report-image-" + slot);
-        const placeholder = $("#print-image-placeholder-" + slot);
-        if (image) { image.src = String(reader.result); image.hidden = false; }
-        if (placeholder) placeholder.hidden = true;
-        renderPreviewImageGrid();
-        if ($("#lightbox-dialog")?.open && currentActiveLightboxSlot === slot) {
-          $("#lightbox-img").src = String(reader.result);
-        }
+    const slot = currentSlotForUpload;
+    const file = files[0];
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      printImageSources[slot] = String(reader.result);
+      savePrintImages();
+      const image = $("#print-report-image-" + slot);
+      const placeholder = $("#print-image-placeholder-" + slot);
+      if (image) { image.src = String(reader.result); image.hidden = false; }
+      if (placeholder) placeholder.hidden = true;
+      renderPreviewImageGrid();
+      if ($("#lightbox-dialog")?.open && currentActiveLightboxSlot === slot) {
+        $("#lightbox-img").src = String(reader.result);
+      }
       currentSlotForUpload = null;
     });
     reader.readAsDataURL(file);
