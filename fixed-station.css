@@ -131,6 +131,12 @@
 .fixed-province-tab small {
   color: var(--text-tertiary);
   font-size: 9px;
+  line-height: 1.35;
+}
+
+.fixed-province-tab .fixed-province-online {
+  color: var(--accent-dark);
+  font-weight: 600;
 }
 
 .fixed-empty {
@@ -139,6 +145,10 @@
   color: var(--text-tertiary);
   font-size: 11px;
   text-align: center;
+}
+
+.print-page-four {
+  display: none;
 }
 
 @media (max-width: 1180px) {
@@ -180,5 +190,141 @@
 
   .report-column {
     display: block !important;
+  }
+
+  .print-page-four {
+    display: block !important;
+    break-before: page;
+    page-break-before: always;
+    min-height: 280mm;
+    padding-top: 4mm;
+  }
+
+  .print-fixed-page-frame {
+    min-height: 275mm;
+    padding: 7px 9px;
+    border: 1px solid #dde5eb;
+    border-radius: 7px;
+    background: #fff;
+  }
+
+  .print-fixed-title-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #cbd6de;
+  }
+
+  .print-fixed-title-row h2 {
+    margin: 0;
+    color: #17324b;
+    font-size: 13px !important;
+    line-height: 1.2;
+  }
+
+  .print-fixed-subtitle {
+    margin: 2px 0 0;
+    color: #6c8193;
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: .25px;
+  }
+
+  .print-fixed-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .print-fixed-summary > div {
+    display: grid;
+    gap: 3px;
+    padding: 7px 8px;
+    border: 1px solid #dde5eb;
+    border-radius: 6px;
+    background: #fff;
+  }
+
+  .print-fixed-summary span {
+    color: #6c8193;
+    font-size: 8px;
+  }
+
+  .print-fixed-summary strong {
+    color: #17324b;
+    font-size: 11px;
+  }
+
+  .print-fixed-province-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .print-fixed-province-card {
+    min-height: 34mm;
+    padding: 9px 10px;
+    border: 1px solid #dde5eb;
+    border-radius: 7px;
+    background: #fff;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .print-fixed-province-head,
+  .print-fixed-province-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .print-fixed-province-head strong {
+    color: #17324b;
+    font-size: 11px;
+  }
+
+  .print-fixed-province-head span {
+    color: #177b7b;
+    font-size: 9px;
+    font-weight: 700;
+  }
+
+  .print-fixed-province-card p {
+    margin: 7px 0 5px;
+    color: #6c8193;
+    font-size: 8.5px;
+  }
+
+  .print-fixed-province-card p strong {
+    color: #17324b;
+  }
+
+  .print-fixed-progress {
+    height: 4px;
+    overflow: hidden;
+    margin-bottom: 6px;
+    border-radius: 4px;
+    background: #e6eef2;
+  }
+
+  .print-fixed-progress i {
+    display: block;
+    height: 100%;
+    background: #177b7b;
+  }
+
+  .print-fixed-province-foot {
+    color: #6c8193;
+    font-size: 8px;
+  }
+
+  .print-fixed-province-foot .has-offline {
+    color: #b84a56;
+    font-weight: 600;
   }
 }
