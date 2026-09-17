@@ -168,7 +168,7 @@
     renderPrintFixedPage();
   }
 
-  function printHeaderMarkup(periodId = "print-period-label-page4") {
+  function printHeaderMarkup() {
     return '<div class="print-header">' +
       '<div class="print-logo-box"><img src="./logo/Nbtc.png" alt="สำนักงาน กสทช." class="print-logo-nbtc" /></div>' +
       '<div class="print-header-center"><div class="print-project-title">' +
@@ -176,7 +176,7 @@
         '<span class="print-project-name">โครงการเพิ่มประสิทธิภาพระบบโครงข่ายสื่อสารด้วยอุปกรณ์ทวนสัญญาณผ่านคลื่นความถี่สูง (SHF)</span><br>' +
         'เพื่อสนับสนุนการปฏิบัติราชการและแก้ไขปัญหาให้กับประชาชนในพื้นที่ห่างไกล<br>' +
         'สัญญาเลขที่ ๘๖๘๐๒๒๘ ลงวันที่ ๒๓ กรกฎาคม ๒๕๖๘' +
-      '</div><div class="print-period-label" id="' + periodId + '"></div></div>' +
+      '</div></div>' +
       '<div class="print-logo-box"><img src="./logo/EX Forth.png" alt="Forth Corporation" class="print-logo-forth" /></div>' +
       '</div>';
   }
@@ -190,10 +190,10 @@
     section.id = "print-fixed-page";
     section.setAttribute("aria-label", "รายงานหน้าที่ 4 สถานีลูกข่ายชนิดประจำที่");
     section.innerHTML = '<div class="print-page-frame print-fixed-page-frame">' +
-      printHeaderMarkup("print-period-label-page4") +
+      printHeaderMarkup() +
       '<div class="print-fixed-title-row">' +
         '<div><p class="panel-kicker">REPORT PAGE 4</p><h2>สถานีลูกข่ายชนิดประจำที่</h2><p class="print-fixed-subtitle">/ FIXED STATION SUMMARY</p></div>' +
-        '<span class="subtle" id="print-fixed-province-count"></span>' +
+        '<span class="subtle print-fixed-report-date" id="print-fixed-province-count"></span>' +
       '</div>' +
       '<div class="print-fixed-summary" id="print-fixed-summary"></div>' +
       '<div class="print-fixed-province-grid" id="print-fixed-province-grid"></div>' +
@@ -223,10 +223,10 @@
     sheet.className = "paper-sheet preview-print-frame preview-fixed-page";
     sheet.id = "preview-page4-sheet";
     sheet.innerHTML =
-      printHeaderMarkup("print-period-label-modal-page4") +
+      printHeaderMarkup() +
       '<div class="print-fixed-title-row">' +
         '<div><p class="panel-kicker">REPORT PAGE 4</p><h2>สถานีลูกข่ายชนิดประจำที่</h2><p class="print-fixed-subtitle">/ FIXED STATION SUMMARY</p></div>' +
-        '<span class="subtle" id="preview-fixed-province-count"></span>' +
+        '<span class="subtle print-fixed-report-date" id="preview-fixed-province-count"></span>' +
       '</div>' +
       '<div class="print-fixed-summary" id="preview-fixed-summary"></div>' +
       '<div class="print-fixed-province-grid" id="preview-fixed-province-grid"></div>';
@@ -272,16 +272,12 @@
     const online = fixedStations.filter((station) => station.status === "online").length;
     const offline = total - online;
     const dateLabel = q("#print-period-label")?.textContent || "";
+    const reportDateMarkup = 'วันที่รายงาน: <strong>' + esc(dateLabel) + '</strong>';
 
-    ["#print-period-label-page4", "#print-period-label-modal-page4"].forEach((selector) => {
-      const period = q(selector);
-      if (period) period.textContent = dateLabel;
-    });
-
-    const printProvinceCount = q("#print-fixed-province-count");
-    if (printProvinceCount) printProvinceCount.textContent = provinces.length + " จังหวัด";
-    const previewProvinceCount = q("#preview-fixed-province-count");
-    if (previewProvinceCount) previewProvinceCount.textContent = provinces.length + " จังหวัด";
+    const printReportDate = q("#print-fixed-province-count");
+    if (printReportDate) printReportDate.innerHTML = reportDateMarkup;
+    const previewReportDate = q("#preview-fixed-province-count");
+    if (previewReportDate) previewReportDate.innerHTML = reportDateMarkup;
 
     const summaryMarkup = fixedSummaryMarkup(provinces, total, online, offline);
     const cardMarkup = fixedProvinceCardsMarkup(provinces);
