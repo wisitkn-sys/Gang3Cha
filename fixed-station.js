@@ -3,6 +3,7 @@
     name: "รายงานประจำวันชุมสาย v2.5.xlsx",
     url: "https://raw.githubusercontent.com/wisitkn-sys/Gang3Cha/main/Data/%23U0e23%23U0e32%23U0e22%23U0e07%23U0e32%23U0e19%23U0e1b%23U0e23%23U0e30%23U0e08%23U0e33%23U0e27%23U0e31%23U0e19%23U0e0a%23U0e38%23U0e21%23U0e2a%23U0e32%23U0e22%20v2.5.xlsx"
   };
+  const BSSC_LINK = "https://ifm.dopa-ifm.com:8443/zabbix.php?action=map.view&sysmapid=412";
 
   let fixedStations = [];
   const selectedProvinces = new Set();
@@ -126,6 +127,13 @@
     if (typeof originalRenderStations === "function") originalRenderStations();
   }
 
+  function provinceStats(province) {
+    const rows = fixedStations.filter((station) => station.province === province);
+    const online = rows.filter((station) => station.status === "online").length;
+    const offline = rows.length - online;
+    return { rows, total: rows.length, online, offline };
+  }
+
   function renderProvincePanel() {
     const tabs = q("#fixed-province-tabs");
     if (!tabs) return;
@@ -137,10 +145,13 @@
 
     tabs.innerHTML = provinces.length
       ? provinces.map((province) => {
-          const rows = fixedStations.filter((station) => station.province === province);
-          const offline = rows.filter((station) => station.status === "down").length;
+          const stats = provinceStats(province);
           const active = selectedProvinces.has(province);
-          return '<button type="button" class="fixed-province-tab' + (active ? ' active' : '') + '" data-province="' + esc(province) + '" aria-pressed="' + active + '"><span>' + esc(province) + '</span><small>' + rows.length + ' จุด' + (offline ? ' · Offline ' + offline : '') + '</small></button>';
+          return '<button type="button" class="fixed-province-tab' + (active ? ' active' : '') + '" data-province="' + esc(province) + '" aria-pressed="' + active + '">' +
+            '<span>' + esc(province) + '</span>' +
+            '<small>จำนวนลูกข่ายทั้งหมด ' + stats.total + ' จุด</small>' +
+            '<small class="fixed-province-online">Online ' + stats.online + '/' + stats.total + ' จุด</small>' +
+            '</button>';
         }).join("")
       : '<span class="fixed-empty">กำลังโหลดข้อมูล Fixed Station…</span>';
 
@@ -154,6 +165,78 @@
         if (q('.station-type.active[data-type="fixed"]')) renderFixedStationTable();
       });
     });
+    renderPrintFixedPage();
+  }
+
+  function printHeaderMarkup() {
+    return '<div class="print-header">' +
+      '<div class="print-logo-box"><img src="./logo/Nbtc.png" alt="สำนักงาน กสทช." class="print-logo-nbtc" /></div>' +
+      '<div class="print-header-center"><div class="print-project-title">' +
+        'การจัดซื้ออุปกรณ์พร้อมดำเนินการติดตั้ง<br>' +
+        '<span class="print-project-name">โครงการเพิ่มประสิทธิภาพระบบโครงข่ายสื่อสารด้วยอุปกรณ์ทวนสัญญาณผ่านคลื่นความถี่สูง (SHF)</span><br>' +
+        'เพื่อสนับสนุนการปฏิบัติราชการและแก้ไขปัญหาให้กับประชาชนในพื้นที่ห่างไกล<br>' +
+        'สัญญาเลขที่ ๘๖๘๐๒๒๘ ลงวันที่ ๒๓ กรกฎาคม ๒๕๖๘' +
+      '</div><div class="print-period-label" id="print-period-label-page4"></div></div>' +
+      '<div class="print-logo-box"><img src="./logo/EX Forth.png" alt="Forth Corporation" class="print-logo-forth" /></div>' +
+      '</div>';
+  }
+
+  function createPrintPageFour() {
+    if (q("#print-fixed-page")) return;
+    const main = q(".main-content");
+    if (!main) return;
+    const section = document.createElement("section");
+    section.className = "print-page-four";
+    section.id = "print-fixed-page";
+    section.setAttribute("aria-label", "รายงานหน้าที่ 4 สถานีลูกข่ายชนิดประจำที่");
+    section.innerHTML = '<div class="print-page-frame print-fixed-page-frame">' +
+      printHeaderMarkup() +
+      '<div class="print-fixed-title-row">' +
+        '<div><p class="panel-kicker">REPORT PAGE 4</p><h2>สถานีลูกข่ายชนิดประจำที่</h2><p class="print-fixed-subtitle">/ FIXED STATION SUMMARY</p></div>' +
+        '<span class="subtle" id="print-fixed-province-count"></span>' +
+      '</div>' +
+      '<div class="print-fixed-summary" id="print-fixed-summary"></div>' +
+      '<div class="print-fixed-province-grid" id="print-fixed-province-grid"></div>' +
+      '</div>';
+    const footer = q("footer");
+    if (footer) main.insertBefore(section, footer);
+    else main.appendChild(section);
+  }
+
+  function renderPrintFixedPage() {
+    createPrintPageFour();
+    const provinces = [...new Set(fixedStations.map((station) => station.province).filter(Boolean))].slice(0, 10);
+    const total = fixedStations.length;
+    const online = fixedStations.filter((station) => station.status === "online").length;
+    const offline = total - online;
+    const dateLabel = q("#print-period-label")?.textContent || "";
+    const period = q("#print-period-label-page4");
+    if (period) period.textContent = dateLabel;
+    const provinceCount = q("#print-fixed-province-count");
+    if (provinceCount) provinceCount.textContent = provinces.length + " จังหวัด";
+
+    const summary = q("#print-fixed-summary");
+    if (summary) {
+      summary.innerHTML =
+        '<div><span>จังหวัดทั้งหมด</span><strong>' + provinces.length + ' จังหวัด</strong></div>' +
+        '<div><span>จำนวนลูกข่ายทั้งหมด</span><strong>' + total + ' จุด</strong></div>' +
+        '<div><span>Online</span><strong>' + online + '/' + total + ' จุด</strong></div>' +
+        '<div><span>Offline</span><strong>' + offline + ' จุด</strong></div>';
+    }
+
+    const grid = q("#print-fixed-province-grid");
+    if (grid) {
+      grid.innerHTML = provinces.map((province) => {
+        const stats = provinceStats(province);
+        const pct = stats.total ? (stats.online / stats.total) * 100 : 0;
+        return '<article class="print-fixed-province-card">' +
+          '<div class="print-fixed-province-head"><strong>' + esc(province) + '</strong><span>' + stats.online + '/' + stats.total + '</span></div>' +
+          '<p>จำนวนลูกข่ายทั้งหมด <strong>' + stats.total + ' จุด</strong></p>' +
+          '<div class="print-fixed-progress"><i style="width:' + pct.toFixed(2) + '%"></i></div>' +
+          '<div class="print-fixed-province-foot"><span>Online ' + stats.online + '/' + stats.total + ' จุด</span><span' + (stats.offline ? ' class="has-offline"' : '') + '>Offline ' + stats.offline + ' จุด</span></div>' +
+          '</article>';
+      }).join("");
+    }
   }
 
   function createFixedStationUI() {
@@ -181,7 +264,7 @@
       const fixedPanel = document.createElement("article");
       fixedPanel.className = "panel fixed-province-panel";
       fixedPanel.id = "fixed-provinces";
-      fixedPanel.innerHTML = '<div class="panel-header"><div><p class="panel-kicker">FIXED STATION</p><h3>สถานีรายจังหวัด</h3></div><span class="subtle" id="fixed-province-count">10 จังหวัด</span></div><div class="fixed-province-tabs" id="fixed-province-tabs"><span class="fixed-empty">กำลังโหลดข้อมูล Fixed Station…</span></div>';
+      fixedPanel.innerHTML = '<div class="panel-header"><div><p class="panel-kicker">FIXED STATION</p><h3>สถานีลูกข่ายชนิดประจำที่</h3></div><span class="subtle" id="fixed-province-count">10 จังหวัด</span></div><div class="fixed-province-tabs" id="fixed-province-tabs"><span class="fixed-empty">กำลังโหลดข้อมูล Fixed Station…</span></div>';
       reportColumn.appendChild(fixedPanel);
     }
 
@@ -194,6 +277,18 @@
     });
     q("#station-search")?.addEventListener("input", renderEnhancedStations);
     q("#station-status")?.addEventListener("change", renderEnhancedStations);
+
+    q("#system-grid")?.addEventListener("click", (event) => {
+      const card = event.target.closest(".system-card");
+      if (card?.dataset.system !== "BSSC") return;
+      window.setTimeout(() => {
+        const link = q("#dialog-system-link");
+        if (!link) return;
+        link.href = BSSC_LINK;
+        link.textContent = "เปิดระบบ BSSC →";
+        link.hidden = false;
+      }, 0);
+    });
   }
 
   async function parseFixedFromFile(file) {
@@ -205,6 +300,7 @@
     fixedStations = parsed;
     selectedProvinces.clear();
     renderProvincePanel();
+    renderPrintFixedPage();
     if (q('.station-type.active[data-type="fixed"]')) renderFixedStationTable();
   }
 
@@ -227,6 +323,7 @@
       selectedProvinces.clear();
       renderProvincePanel();
       renderEnhancedStations();
+      renderPrintFixedPage();
 
       const count = q("#fixed-province-count");
       const provinces = [...new Set(fixedStations.map((station) => station.province).filter(Boolean))].slice(0, 10);
@@ -239,6 +336,7 @@
   }
 
   createFixedStationUI();
+  createPrintPageFour();
   renderProvincePanel();
 
   const importInput = q("#import-file");
@@ -247,5 +345,6 @@
     if (file) parseFixedFromFile(file).catch((error) => console.warn("Fixed Station import:", error));
   });
 
+  window.addEventListener("beforeprint", renderPrintFixedPage);
   loadLatestWorkbook();
 })();
