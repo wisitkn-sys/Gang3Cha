@@ -101,7 +101,7 @@ function stationRowMarkup(station) {
 function stationTableMarkup(type) {
   const rows = stations.filter((station) => station.type === type);
   return '<div class="preview-station-table-wrap"><table class="preview-station-table">' +
-    '<thead><tr><th>รหัส</th><th>ชื่อสถานี</th><th>อุปกรณ์</th><th>ตรวจล่าสุด</th><th>สถานะ</th></tr></thead>' +
+    '<thead><tr><th>หมายเลขสถานี</th><th>ชื่อสถานี</th><th>อุปกรณ์</th><th>ตรวจล่าสุด</th><th>สถานะ</th></tr></thead>' +
     '<tbody>' + rows.map(stationRowMarkup).join("") + '</tbody></table></div>';
 }
 function validPrintImageSource(source) {

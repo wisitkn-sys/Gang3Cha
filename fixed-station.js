@@ -72,7 +72,7 @@
   }
 
   function standardTableHead() {
-    return '<tr><th>รหัส</th><th>ชื่อสถานี</th><th>อุปกรณ์</th><th>ตรวจล่าสุด</th><th>สถานะ</th></tr>';
+    return '<tr><th>หมายเลขสถานี</th><th>ชื่อสถานี</th><th>อุปกรณ์</th><th>ตรวจล่าสุด</th><th>สถานะ</th></tr>';
   }
 
   function fixedTableHead() {
