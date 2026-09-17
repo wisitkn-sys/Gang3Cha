@@ -130,8 +130,8 @@
   function provinceStats(province) {
     const rows = fixedStations.filter((station) => station.province === province);
     const online = rows.filter((station) => station.status === "online").length;
-    const offline = rows.length - online;
-    return { rows, total: rows.length, online, offline };
+    const offlineRows = rows.filter((station) => station.status === "down");
+    return { rows, total: rows.length, online, offline: offlineRows.length, offlineRows };
   }
 
   function renderProvincePanel() {
@@ -168,7 +168,7 @@
     renderPrintFixedPage();
   }
 
-  function printHeaderMarkup() {
+  function printHeaderMarkup(periodId = "print-period-label-page4") {
     return '<div class="print-header">' +
       '<div class="print-logo-box"><img src="./logo/Nbtc.png" alt="สำนักงาน กสทช." class="print-logo-nbtc" /></div>' +
       '<div class="print-header-center"><div class="print-project-title">' +
@@ -176,7 +176,7 @@
         '<span class="print-project-name">โครงการเพิ่มประสิทธิภาพระบบโครงข่ายสื่อสารด้วยอุปกรณ์ทวนสัญญาณผ่านคลื่นความถี่สูง (SHF)</span><br>' +
         'เพื่อสนับสนุนการปฏิบัติราชการและแก้ไขปัญหาให้กับประชาชนในพื้นที่ห่างไกล<br>' +
         'สัญญาเลขที่ ๘๖๘๐๒๒๘ ลงวันที่ ๒๓ กรกฎาคม ๒๕๖๘' +
-      '</div><div class="print-period-label" id="print-period-label-page4"></div></div>' +
+      '</div><div class="print-period-label" id="' + periodId + '"></div></div>' +
       '<div class="print-logo-box"><img src="./logo/EX Forth.png" alt="Forth Corporation" class="print-logo-forth" /></div>' +
       '</div>';
   }
@@ -190,7 +190,7 @@
     section.id = "print-fixed-page";
     section.setAttribute("aria-label", "รายงานหน้าที่ 4 สถานีลูกข่ายชนิดประจำที่");
     section.innerHTML = '<div class="print-page-frame print-fixed-page-frame">' +
-      printHeaderMarkup() +
+      printHeaderMarkup("print-period-label-page4") +
       '<div class="print-fixed-title-row">' +
         '<div><p class="panel-kicker">REPORT PAGE 4</p><h2>สถานีลูกข่ายชนิดประจำที่</h2><p class="print-fixed-subtitle">/ FIXED STATION SUMMARY</p></div>' +
         '<span class="subtle" id="print-fixed-province-count"></span>' +
@@ -203,40 +203,98 @@
     else main.appendChild(section);
   }
 
+  function createPreviewPageFour() {
+    if (q("#preview-page4-sheet")) return;
+    const container = q(".paper-preview-container");
+    if (!container) return;
+
+    const page3 = q("#preview-page3-sheet");
+    if (page3?.previousElementSibling?.classList.contains("paper-sheet-header")) {
+      const label = page3.previousElementSibling.querySelector("span");
+      if (label) label.textContent = "หน้า 3 / Page 3";
+    }
+
+    const header = document.createElement("div");
+    header.className = "paper-sheet-header";
+    header.id = "preview-page4-header";
+    header.innerHTML = '<span>หน้า 4 / Page 4</span><small>สถานีลูกข่ายชนิดประจำที่</small>';
+
+    const sheet = document.createElement("div");
+    sheet.className = "paper-sheet preview-print-frame preview-fixed-page";
+    sheet.id = "preview-page4-sheet";
+    sheet.innerHTML =
+      printHeaderMarkup("print-period-label-modal-page4") +
+      '<div class="print-fixed-title-row">' +
+        '<div><p class="panel-kicker">REPORT PAGE 4</p><h2>สถานีลูกข่ายชนิดประจำที่</h2><p class="print-fixed-subtitle">/ FIXED STATION SUMMARY</p></div>' +
+        '<span class="subtle" id="preview-fixed-province-count"></span>' +
+      '</div>' +
+      '<div class="print-fixed-summary" id="preview-fixed-summary"></div>' +
+      '<div class="print-fixed-province-grid" id="preview-fixed-province-grid"></div>';
+
+    container.appendChild(header);
+    container.appendChild(sheet);
+  }
+
+  function fixedSummaryMarkup(provinces, total, online, offline) {
+    return '<div><span>จังหวัดทั้งหมด</span><strong>' + provinces.length + ' จังหวัด</strong></div>' +
+      '<div><span>จำนวนลูกข่ายทั้งหมด</span><strong>' + total + ' จุด</strong></div>' +
+      '<div><span>Online</span><strong>' + online + '/' + total + ' จุด</strong></div>' +
+      '<div><span>Offline</span><strong>' + offline + ' จุด</strong></div>';
+  }
+
+  function fixedProvinceCardsMarkup(provinces) {
+    return provinces.map((province) => {
+      const stats = provinceStats(province);
+      const pct = stats.total ? (stats.online / stats.total) * 100 : 0;
+      const offlineVillages = stats.offlineRows
+        .map((station) => station.village || (station.tor ? "TOR " + station.tor : ""))
+        .filter(Boolean);
+      const offlineDetail = offlineVillages.length
+        ? '<div class="print-fixed-offline-list"><strong>Offline:</strong><span>' + offlineVillages.map(esc).join(' · ') + '</span></div>'
+        : '';
+
+      return '<article class="print-fixed-province-card">' +
+        '<div class="print-fixed-province-head"><strong>' + esc(province) + '</strong><span>' + stats.online + '/' + stats.total + '</span></div>' +
+        '<p>จำนวนลูกข่ายทั้งหมด <strong>' + stats.total + ' จุด</strong></p>' +
+        '<div class="print-fixed-progress"><i style="width:' + pct.toFixed(2) + '%"></i></div>' +
+        '<div class="print-fixed-province-foot"><span>Online ' + stats.online + '/' + stats.total + ' จุด</span><span' + (stats.offline ? ' class="has-offline"' : '') + '>Offline ' + stats.offline + ' จุด</span></div>' +
+        offlineDetail +
+        '</article>';
+    }).join("");
+  }
+
   function renderPrintFixedPage() {
     createPrintPageFour();
+    createPreviewPageFour();
+
     const provinces = [...new Set(fixedStations.map((station) => station.province).filter(Boolean))].slice(0, 10);
     const total = fixedStations.length;
     const online = fixedStations.filter((station) => station.status === "online").length;
     const offline = total - online;
     const dateLabel = q("#print-period-label")?.textContent || "";
-    const period = q("#print-period-label-page4");
-    if (period) period.textContent = dateLabel;
-    const provinceCount = q("#print-fixed-province-count");
-    if (provinceCount) provinceCount.textContent = provinces.length + " จังหวัด";
 
-    const summary = q("#print-fixed-summary");
-    if (summary) {
-      summary.innerHTML =
-        '<div><span>จังหวัดทั้งหมด</span><strong>' + provinces.length + ' จังหวัด</strong></div>' +
-        '<div><span>จำนวนลูกข่ายทั้งหมด</span><strong>' + total + ' จุด</strong></div>' +
-        '<div><span>Online</span><strong>' + online + '/' + total + ' จุด</strong></div>' +
-        '<div><span>Offline</span><strong>' + offline + ' จุด</strong></div>';
-    }
+    ["#print-period-label-page4", "#print-period-label-modal-page4"].forEach((selector) => {
+      const period = q(selector);
+      if (period) period.textContent = dateLabel;
+    });
 
-    const grid = q("#print-fixed-province-grid");
-    if (grid) {
-      grid.innerHTML = provinces.map((province) => {
-        const stats = provinceStats(province);
-        const pct = stats.total ? (stats.online / stats.total) * 100 : 0;
-        return '<article class="print-fixed-province-card">' +
-          '<div class="print-fixed-province-head"><strong>' + esc(province) + '</strong><span>' + stats.online + '/' + stats.total + '</span></div>' +
-          '<p>จำนวนลูกข่ายทั้งหมด <strong>' + stats.total + ' จุด</strong></p>' +
-          '<div class="print-fixed-progress"><i style="width:' + pct.toFixed(2) + '%"></i></div>' +
-          '<div class="print-fixed-province-foot"><span>Online ' + stats.online + '/' + stats.total + ' จุด</span><span' + (stats.offline ? ' class="has-offline"' : '') + '>Offline ' + stats.offline + ' จุด</span></div>' +
-          '</article>';
-      }).join("");
-    }
+    const printProvinceCount = q("#print-fixed-province-count");
+    if (printProvinceCount) printProvinceCount.textContent = provinces.length + " จังหวัด";
+    const previewProvinceCount = q("#preview-fixed-province-count");
+    if (previewProvinceCount) previewProvinceCount.textContent = provinces.length + " จังหวัด";
+
+    const summaryMarkup = fixedSummaryMarkup(provinces, total, online, offline);
+    const cardMarkup = fixedProvinceCardsMarkup(provinces);
+
+    const printSummary = q("#print-fixed-summary");
+    if (printSummary) printSummary.innerHTML = summaryMarkup;
+    const previewSummary = q("#preview-fixed-summary");
+    if (previewSummary) previewSummary.innerHTML = summaryMarkup;
+
+    const printGrid = q("#print-fixed-province-grid");
+    if (printGrid) printGrid.innerHTML = cardMarkup;
+    const previewGrid = q("#preview-fixed-province-grid");
+    if (previewGrid) previewGrid.innerHTML = cardMarkup;
   }
 
   function createFixedStationUI() {
@@ -289,6 +347,8 @@
         link.hidden = false;
       }, 0);
     });
+
+    q("#print-report-nav")?.addEventListener("click", () => window.setTimeout(renderPrintFixedPage, 0));
   }
 
   async function parseFixedFromFile(file) {
@@ -337,6 +397,7 @@
 
   createFixedStationUI();
   createPrintPageFour();
+  createPreviewPageFour();
   renderProvincePanel();
 
   const importInput = q("#import-file");
