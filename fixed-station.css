@@ -25,10 +25,14 @@
 }
 
 .station-toggle {
-  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .station-type {
+  width: 100%;
   white-space: nowrap;
   padding-inline: 7px;
 }

@@ -67,8 +67,11 @@ select:focus-visible {
 }
 
 .sidebar {
-  position: static;
-  overflow: visible;
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 28px;
@@ -800,7 +803,10 @@ canvas {
 }
 
 .station-toggle {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  flex: 1 1 0;
+  min-width: 0;
   gap: 3px;
   padding: 3px;
   border-radius: var(--radius-sm);
@@ -808,6 +814,7 @@ canvas {
 }
 
 .station-type {
+  width: 100%;
   padding: 6px 8px;
   border-radius: 4px;
   color: var(--text-tertiary);
@@ -1075,6 +1082,11 @@ footer {
   }
 
   .sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    height: auto;
+    overflow: visible;
     gap: 16px;
     padding: 14px 16px;
   }
