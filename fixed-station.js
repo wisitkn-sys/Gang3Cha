@@ -5,7 +5,7 @@
   };
 
   let fixedStations = [];
-  let activeProvince = "";
+  const selectedProvinces = new Set();
   const originalRenderStations = window.renderStations;
 
   const q = (selector) => document.querySelector(selector);
@@ -41,18 +41,13 @@
     };
 
     return matrix.slice(headerIndex + 1).map((row) => {
-      const tor = row[col.tor];
-      const village = row[col.village];
-      const subdistrict = row[col.subdistrict];
-      const district = row[col.district];
-      const province = row[col.province];
       const offline = checkedValue(row[col.offline]);
       return {
-        tor: String(tor ?? "").trim(),
-        village: String(village ?? "").trim(),
-        subdistrict: String(subdistrict ?? "").trim(),
-        district: String(district ?? "").trim(),
-        province: String(province ?? "").trim(),
+        tor: String(row[col.tor] ?? "").trim(),
+        village: String(row[col.village] ?? "").trim(),
+        subdistrict: String(row[col.subdistrict] ?? "").trim(),
+        district: String(row[col.district] ?? "").trim(),
+        province: String(row[col.province] ?? "").trim(),
         status: offline ? "down" : "online",
         offline
       };
@@ -95,10 +90,15 @@
     if ([...select.options].some((option) => option.value === current)) select.value = current;
   }
 
+  function provinceFilteredStations() {
+    if (!selectedProvinces.size) return fixedStations;
+    return fixedStations.filter((station) => selectedProvinces.has(station.province));
+  }
+
   function renderFixedStationTable() {
     const search = (q("#station-search")?.value || "").trim().toLowerCase();
     const status = q("#station-status")?.value || "all";
-    const rows = fixedStations.filter((station) => {
+    const rows = provinceFilteredStations().filter((station) => {
       const haystack = [station.tor, station.village, station.subdistrict, station.district, station.province].join(" ").toLowerCase();
       return (status === "all" || station.status === status) && haystack.includes(search);
     });
@@ -126,48 +126,34 @@
     if (typeof originalRenderStations === "function") originalRenderStations();
   }
 
-  function selectedProvinceRows() {
-    return fixedStations.filter((station) => station.province === activeProvince);
-  }
-
-  function renderProvinceContent() {
-    const content = q("#fixed-province-content");
-    if (!content) return;
-    const rows = selectedProvinceRows();
-    if (!activeProvince || !rows.length) {
-      content.innerHTML = '<div class="fixed-empty">ยังไม่มีข้อมูล Fixed Station</div>';
-      return;
-    }
-
-    const offlineCount = rows.filter((row) => row.status === "down").length;
-    content.innerHTML =
-      '<div class="fixed-province-summary"><strong>' + esc(activeProvince) + '</strong><span>' + rows.length + ' จุด · Offline ' + offlineCount + ' จุด</span></div>' +
-      '<div class="fixed-province-table-wrap"><table class="fixed-province-table">' +
-      '<thead><tr><th>TOR</th><th>หมู่บ้าน</th><th>ตำบล</th><th>อำเภอ</th><th>สถานะ</th></tr></thead>' +
-      '<tbody>' + rows.map((station) => '<tr><td>' + esc(station.tor) + '</td><td>' + esc(station.village) + '</td><td>' + esc(station.subdistrict) + '</td><td>' + esc(station.district) + '</td><td>' + fixedStatusBadge(station) + '</td></tr>').join("") + '</tbody></table></div>';
-  }
-
   function renderProvincePanel() {
     const tabs = q("#fixed-province-tabs");
     if (!tabs) return;
     const provinces = [...new Set(fixedStations.map((station) => station.province).filter(Boolean))].slice(0, 10);
-    if (!provinces.includes(activeProvince)) activeProvince = provinces[0] || "";
+
+    for (const province of [...selectedProvinces]) {
+      if (!provinces.includes(province)) selectedProvinces.delete(province);
+    }
 
     tabs.innerHTML = provinces.length
       ? provinces.map((province) => {
           const rows = fixedStations.filter((station) => station.province === province);
           const offline = rows.filter((station) => station.status === "down").length;
-          return '<button type="button" class="fixed-province-tab' + (province === activeProvince ? ' active' : '') + '" data-province="' + esc(province) + '"><span>' + esc(province) + '</span><small>' + rows.length + ' จุด' + (offline ? ' · Offline ' + offline : '') + '</small></button>';
+          const active = selectedProvinces.has(province);
+          return '<button type="button" class="fixed-province-tab' + (active ? ' active' : '') + '" data-province="' + esc(province) + '" aria-pressed="' + active + '"><span>' + esc(province) + '</span><small>' + rows.length + ' จุด' + (offline ? ' · Offline ' + offline : '') + '</small></button>';
         }).join("")
       : '<span class="fixed-empty">กำลังโหลดข้อมูล Fixed Station…</span>';
 
     tabs.querySelectorAll(".fixed-province-tab").forEach((button) => {
       button.addEventListener("click", () => {
-        activeProvince = button.dataset.province || "";
+        const province = button.dataset.province || "";
+        if (!province) return;
+        if (selectedProvinces.has(province)) selectedProvinces.delete(province);
+        else selectedProvinces.add(province);
         renderProvincePanel();
+        if (q('.station-type.active[data-type="fixed"]')) renderFixedStationTable();
       });
     });
-    renderProvinceContent();
   }
 
   function createFixedStationUI() {
@@ -195,7 +181,7 @@
       const fixedPanel = document.createElement("article");
       fixedPanel.className = "panel fixed-province-panel";
       fixedPanel.id = "fixed-provinces";
-      fixedPanel.innerHTML = '<div class="panel-header"><div><p class="panel-kicker">FIXED STATION</p><h3>สถานีรายจังหวัด</h3></div><span class="subtle" id="fixed-province-count">10 จังหวัด</span></div><div class="fixed-province-tabs" id="fixed-province-tabs"><span class="fixed-empty">กำลังโหลดข้อมูล Fixed Station…</span></div><div class="fixed-province-content" id="fixed-province-content"></div>';
+      fixedPanel.innerHTML = '<div class="panel-header"><div><p class="panel-kicker">FIXED STATION</p><h3>สถานีรายจังหวัด</h3></div><span class="subtle" id="fixed-province-count">10 จังหวัด</span></div><div class="fixed-province-tabs" id="fixed-province-tabs"><span class="fixed-empty">กำลังโหลดข้อมูล Fixed Station…</span></div>';
       reportColumn.appendChild(fixedPanel);
     }
 
@@ -217,6 +203,7 @@
     const parsed = parseFixedStationSheet(workbook);
     if (!parsed.length) return;
     fixedStations = parsed;
+    selectedProvinces.clear();
     renderProvincePanel();
     if (q('.station-type.active[data-type="fixed"]')) renderFixedStationTable();
   }
@@ -237,11 +224,12 @@
 
       const workbook = XLSX.read(buffer, { type: "array", cellDates: true });
       fixedStations = parseFixedStationSheet(workbook);
+      selectedProvinces.clear();
       renderProvincePanel();
       renderEnhancedStations();
 
       const count = q("#fixed-province-count");
-      const provinces = [...new Set(fixedStations.map((station) => station.province).filter(Boolean))];
+      const provinces = [...new Set(fixedStations.map((station) => station.province).filter(Boolean))].slice(0, 10);
       if (count) count.textContent = provinces.length + " จังหวัด";
     } catch (error) {
       console.warn("Fixed Station data:", error);
