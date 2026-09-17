@@ -151,6 +151,24 @@
   display: none;
 }
 
+/* Report dates are shown in the report content area, not below the project title. */
+.print-header .print-period-label,
+.print-header [id^="print-period-label"] {
+  display: none !important;
+}
+
+.print-fixed-report-date {
+  color: #6c8193;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.print-fixed-report-date strong {
+  color: #17324b;
+  font-size: 11px;
+  font-weight: 700;
+}
+
 .preview-fixed-page .print-header {
   display: flex !important;
   align-items: center;
@@ -425,6 +443,14 @@
     font-size: 8.5px;
     font-weight: 600;
     letter-spacing: .25px;
+  }
+
+  .print-fixed-report-date {
+    font-size: 8.5px;
+  }
+
+  .print-fixed-report-date strong {
+    font-size: 9px;
   }
 
   .print-fixed-summary {
