@@ -113,14 +113,28 @@ function savePrintImages() {
 function ensurePrintImageSlots() {
   const imageGrid = $("#print-image-grid");
   if (!imageGrid || imageGrid.children.length === 4) return;
-  const labels = ["BSSC", "SD-WAN", "Microwave", "Dispatcher"];
-  imageGrid.innerHTML = labels.map((label, index) => {
+  const systemsForImages = [
+    { label: "BSSC", title: "สถานะอุปกรณ์ระบบ BSSC" },
+    { label: "SD-WAN", title: "สถานะอุปกรณ์ระบบ SD-WAN" },
+    { label: "Microwave", title: "สถานะอุปกรณ์ระบบ Microwave" },
+    { label: "Dispatcher", title: "สถานะอุปกรณ์ระบบ Dispatcher" }
+  ];
+
+  imageGrid.innerHTML = systemsForImages.map((item, index) => {
     const hasImage = validPrintImageSource(printImageSources[index]);
-    return '<button class="print-image-block" type="button" data-slot="' + index + '" title="คลิกเพื่อเลือกรูปภาพ ' + label + '"><span id="print-image-placeholder-' + index + '"' + (hasImage ? ' hidden' : '') + '>รูปภาพ ' + label + ' (คลิกเพื่อเลือกรูป)</span><img id="print-report-image-' + index + '" alt="รูปภาพประกอบระบบ ' + label + '"' + (hasImage ? '' : ' hidden') + ' /></button>';
+    return '<button class="print-image-block" type="button" data-slot="' + index + '" title="คลิกเพื่อเลือกรูปภาพ ' + item.label + '">' +
+      '<div class="print-image-media">' +
+        '<span id="print-image-placeholder-' + index + '"' + (hasImage ? ' hidden' : '') + '>แนบรูปภาพ ' + item.label + '</span>' +
+        '<img id="print-report-image-' + index + '" alt="รูปภาพประกอบระบบ ' + item.label + '"' + (hasImage ? '' : ' hidden') + ' />' +
+      '</div>' +
+      '<div class="print-image-caption">' + item.title + '</div>' +
+      '</button>';
   }).join("");
-  labels.forEach((label, index) => {
+
+  systemsForImages.forEach((item, index) => {
     if (validPrintImageSource(printImageSources[index])) $("#print-report-image-" + index).src = printImageSources[index];
   });
+
   imageGrid.querySelectorAll(".print-image-block").forEach((block) => {
     block.addEventListener("click", () => {
       currentSlotForUpload = parseInt(block.dataset.slot, 10);
@@ -136,16 +150,21 @@ function renderPreviewImageGrid() {
   const previewGrid = $("#preview-image-grid");
   if (!previewGrid) return;
   ensurePrintImageSlots();
-  const labels = ["BSSC", "SD-WAN", "Microwave", "Dispatcher"];
+  const systemsForImages = [
+    { label: "BSSC", title: "สถานะอุปกรณ์ระบบ BSSC" },
+    { label: "SD-WAN", title: "สถานะอุปกรณ์ระบบ SD-WAN" },
+    { label: "Microwave", title: "สถานะอุปกรณ์ระบบ Microwave" },
+    { label: "Dispatcher", title: "สถานะอุปกรณ์ระบบ Dispatcher" }
+  ];
 
-  previewGrid.innerHTML = labels.map((label, index) => {
+  previewGrid.innerHTML = systemsForImages.map((item, index) => {
     const imgEl = $("#print-report-image-" + index);
     const hasImage = Boolean(imgEl && imgEl.src && !imgEl.hidden);
 
     return '<div class="preview-image-card" data-slot="' + index + '">' +
       '<button class="preview-card-img-wrap" type="button" data-action="' + (hasImage ? 'view' : 'upload') + '" data-slot="' + index + '">' +
       (hasImage ?
-        '<img alt="รูปภาพประกอบระบบ ' + label + '" />' +
+        '<img alt="รูปภาพประกอบระบบ ' + item.label + '" />' +
         '<div class="preview-card-overlay">' +
         '<span class="preview-card-zoom-badge">' +
         '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">' +
@@ -161,19 +180,20 @@ function renderPreviewImageGrid() {
         '<circle cx="8.5" cy="8.5" r="1.5"></circle>' +
         '<polyline points="21 15 16 10 5 21"></polyline>' +
         '</svg>' +
-        '<span>แนบรูปภาพ ' + label + '</span>' +
+        '<span>แนบรูปภาพ ' + item.label + '</span>' +
         '</div>'
       ) +
       '</button>' +
       '<div class="preview-card-footer">' +
-      '<span class="preview-card-title">รูปภาพ ' + label + '</span>' +
+      '<span class="preview-card-title">' + item.title + '</span>' +
       '<span class="preview-card-status ' + (hasImage ? 'has-image' : 'no-image') + '">' +
       (hasImage ? 'แนบรูปแล้ว' : 'ยังไม่ได้แนบ') +
       '</span>' +
       '</div>' +
       '</div>';
   }).join("");
-  labels.forEach((label, index) => {
+
+  systemsForImages.forEach((item, index) => {
     const imgEl = $("#print-report-image-" + index);
     const previewImg = previewGrid.querySelector('[data-slot="' + index + '"] img');
     if (imgEl && previewImg) previewImg.src = imgEl.src;
