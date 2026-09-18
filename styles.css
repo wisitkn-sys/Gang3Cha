@@ -746,7 +746,8 @@ canvas {
 .system-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
+  gap: 16px;
+  margin-top: 16px;
 }
 
 .system-card {

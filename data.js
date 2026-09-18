@@ -1,7 +1,7 @@
 // Extracted from: รายงานประจำวันชุมสาย v2.2.xlsx
 // Sheets: รายงานสรุป, Overview, Event Log
 window.dashboardData = {
-  version: "1.4.0",
+  version: "1.4.1",
   systemStatusSchema: 2,
   source: "รายงานประจำวันชุมสาย v2.2.xlsx",
   systems: [
