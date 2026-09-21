@@ -1004,6 +1004,30 @@ footer {
   display: none;
 }
 
+.print-page1-date-row {
+  display: none;
+}
+
+.preview-page1-date-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-bottom: 8px;
+  margin: 0 0 10px;
+  border-bottom: 1px solid #cbd6de;
+}
+
+.preview-page1-date-row .print-overview-date {
+  margin: 0;
+  color: #6c8193;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.preview-page1-date-row .print-overview-date strong {
+  color: #17324b;
+}
+
 .print-only-stations,
 .print-page-two,
 .print-page-three {
@@ -1293,6 +1317,26 @@ footer {
     padding-bottom: 6px;
     margin-bottom: 7px;
     border-bottom: 1.5px solid #cbd6de;
+  }
+
+  .print-page1-date-row {
+    display: flex !important;
+    justify-content: flex-end;
+    align-items: center;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #cbd6de;
+  }
+
+  .print-page1-date-row .print-overview-date {
+    margin: 0 0 1px;
+    color: #6c8193;
+    font-size: 8.5px;
+    white-space: nowrap;
+  }
+
+  .print-page1-date-row .print-overview-date strong {
+    color: #17324b;
   }
 
   .print-logo-box {
