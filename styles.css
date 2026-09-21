@@ -1004,29 +1004,6 @@ footer {
   display: none;
 }
 
-.print-page1-date-row {
-  display: none;
-}
-
-.preview-page1-date-row {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding-bottom: 8px;
-  margin: 0 0 10px;
-  border-bottom: 1px solid #cbd6de;
-}
-
-.preview-page1-date-row .print-overview-date {
-  margin: 0;
-  color: #6c8193;
-  font-size: 10px;
-  white-space: nowrap;
-}
-
-.preview-page1-date-row .print-overview-date strong {
-  color: #17324b;
-}
 
 .print-only-stations,
 .print-page-two,
@@ -1319,25 +1296,6 @@ footer {
     border-bottom: 1.5px solid #cbd6de;
   }
 
-  .print-page1-date-row {
-    display: flex !important;
-    justify-content: flex-end;
-    align-items: center;
-    padding-bottom: 5px;
-    margin-bottom: 5px;
-    border-bottom: 1px solid #cbd6de;
-  }
-
-  .print-page1-date-row .print-overview-date {
-    margin: 0 0 1px;
-    color: #6c8193;
-    font-size: 8.5px;
-    white-space: nowrap;
-  }
-
-  .print-page1-date-row .print-overview-date strong {
-    color: #17324b;
-  }
 
   .print-logo-box {
     flex: 0 0 108px;
@@ -1401,6 +1359,28 @@ footer {
     box-shadow: none !important;
     border: 1px solid #cce8e2 !important;
     border-radius: 7px !important;
+  }
+
+  .action-center .action-copy {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .print-action-date {
+    display: block !important;
+    flex: 0 0 auto;
+    margin-left: auto;
+    padding-left: 10px;
+    color: #6c8193;
+    font-size: 8.5px;
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  .print-action-date strong {
+    color: #17324b;
+    font-size: 8.5px;
+    font-weight: 700;
   }
 
   .action-icon {
@@ -2426,16 +2406,43 @@ footer {
   font-size: 9px;
 }
 
+.print-action-date {
+  display: none;
+}
+
 .preview-action-center {
-  display: grid;
-  gap: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
   padding: 8px 10px;
   border: 1px solid #cce8e2;
   border-radius: 8px;
   background: #e9f8f5;
 }
+
+.preview-action-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
 .preview-action-center strong { color: #17324b; font-size: 12px; }
 .preview-action-center span { color: #3d586c; font-size: 10px; }
+
+.preview-action-date {
+  flex: 0 0 auto;
+  color: #6c8193;
+  font-size: 10px;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.preview-action-date strong {
+  color: #17324b;
+  font-size: 10px;
+  font-weight: 700;
+}
 
 .preview-dashboard-grid {
   display: grid;
