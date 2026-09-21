@@ -247,7 +247,7 @@ function renderPrintPreviewPageOne() {
 
   if (content) {
     content.innerHTML =
-      '<div class="preview-action-center"><strong>' + ($("#overall-title")?.textContent || "ไม่มีรายการที่ต้องดำเนินการ") + '</strong><span>' + ($("#overall-detail")?.textContent || "") + '</span></div>' +
+      '<div class="preview-action-center"><div class="preview-action-copy"><strong>' + ($("#overall-title")?.textContent || "ไม่มีรายการที่ต้องดำเนินการ") + '</strong><span>' + ($("#overall-detail")?.textContent || "") + '</span></div><div class="preview-action-date"><span>วันที่รายงาน:</span> <strong>' + reportDateLabel() + '</strong></div></div>' +
       '<div class="preview-kpi-grid">' +
       '<div><span>ความพร้อมใช้งานเฉลี่ย</span><strong>' + Number(availability).toFixed(2) + '%</strong></div>' +
       '<div><span>สถานีออนไลน์</span><strong>' + metrics.online + ' / ' + metrics.total + ' จุด</strong></div>' +
@@ -354,7 +354,6 @@ function renderPrintPages() {
   if ($("#print-period-label-modal-page2")) $("#print-period-label-modal-page2").textContent = printLabel;
   if ($("#print-period-label-modal-page3")) $("#print-period-label-modal-page3").textContent = printLabel;
   if ($("#print-page1-date")) $("#print-page1-date").textContent = printLabel;
-  if ($("#print-page1-date-modal")) $("#print-page1-date-modal").textContent = printLabel;
   renderPrintOverviews();
   ensurePrintImageSlots();
   renderPrintPreviewPageOne();
