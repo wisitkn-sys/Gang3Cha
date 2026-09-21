@@ -353,6 +353,8 @@ function renderPrintPages() {
   if ($("#print-period-label-modal")) $("#print-period-label-modal").textContent = printLabel;
   if ($("#print-period-label-modal-page2")) $("#print-period-label-modal-page2").textContent = printLabel;
   if ($("#print-period-label-modal-page3")) $("#print-period-label-modal-page3").textContent = printLabel;
+  if ($("#print-page1-date")) $("#print-page1-date").textContent = printLabel;
+  if ($("#print-page1-date-modal")) $("#print-page1-date-modal").textContent = printLabel;
   renderPrintOverviews();
   ensurePrintImageSlots();
   renderPrintPreviewPageOne();
