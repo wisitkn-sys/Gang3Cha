@@ -1,12 +1,10 @@
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
-const systemStatusSchema = 2;
-const bundledSystems = window.dashboardData.systems;
+const systemStatusSchema = 3;
 try {
   const storedData = JSON.parse(localStorage.getItem("dtrs-dashboard-data"));
-  if (storedData) {
+  if (storedData?.systemStatusSchema === systemStatusSchema) {
     Object.assign(window.dashboardData, storedData);
-    if (storedData.systemStatusSchema !== systemStatusSchema) window.dashboardData.systems = bundledSystems;
   }
 } catch { /* Keep bundled data. */ }
 

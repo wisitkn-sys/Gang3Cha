@@ -2,8 +2,8 @@
 // Sheets: รายงานสรุป, Overview, Event Log
 window.dashboardData = {
   version: "1.4.1",
-  systemStatusSchema: 2,
-  source: "รายงานประจำวันชุมสาย v2.2.xlsx",
+  systemStatusSchema: 3,
+  source: "รายงานประจำวันชุมสาย v2.5.xlsx",
   systems: [
     { id: "BSSC", name: "BSSC", scope: "ระบบศูนย์ควบคุมสถานีแม่ข่าย", status: "online" },
     { id: "SD-WAN", name: "SD-WAN", scope: "ระบบบริหารจัดการ iMaster NCE Campus", status: "online" },
@@ -14,13 +14,13 @@ window.dashboardData = {
     ["BS-261", "BS หนองนกแก้ว"], ["BS-262", "BS ศรีสุขสำราญ"], ["BS-263", "BS คลองป่าหมู"],
     ["BS-264", "BS วัดบางอุดม"], ["BS-265", "BS วังงิ้ว"], ["BS-266", "BS บ้านปางใหม่พัฒนา"],
     ["BS-267", "BS ช่อง"], ["BS-268", "BS คลองพลู"]
-  ].map(([code, name]) => ({ type: "base", code, name, device: "Base Station", checked: "08:30", status: "online" })).concat(
+  ].map(([code, name]) => ({ type: "base", code, name, device: "Base Station", checked: "08:30", status: code === "BS-265" ? "down" : "online", alarmCount: code === "BS-265" ? 3 : 0 })).concat(
     ["ห้วยกระเจา", "คลองลาน", "เขาสวนกวาง", "เขาคิชฌกูฎ", "ย่านตาขาว", "วังน้ำเขียว", "หัวไทร", "ดงเจริญ"].map((name, index) => ({
       type: "gateway", code: "AGW-" + String(index + 1).padStart(2, "0"), name,
-      device: "Analog Gateway", checked: "08:30", status: "online"
+      device: "Analog Gateway", checked: "08:30", status: "online", alarmCount: 0
     }))
   ),
-  summary: { reportDate: "5 กันยายน 2569", averageAvailability: 99.832549, totalDowntime: 299, online100Days: 18, stationsToFollow: 0 },
+  summary: { reportDate: "5 กันยายน 2569", averageAvailability: 99.832549, totalDowntime: 299, online100Days: 18, stationsToFollow: 1 },
   events: {
     period: "2026-08-01/2026-08-31",
     systems: ["BSSC", "SD-WAN", "Microwave", "Dispatcher"],
