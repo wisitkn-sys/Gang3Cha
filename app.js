@@ -1,12 +1,7 @@
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 const systemStatusSchema = 3;
-try {
-  const storedData = JSON.parse(localStorage.getItem("dtrs-dashboard-data"));
-  if (storedData?.systemStatusSchema === systemStatusSchema) {
-    Object.assign(window.dashboardData, storedData);
-  }
-} catch { /* Keep bundled data. */ }
+try { localStorage.removeItem("dtrs-dashboard-data"); } catch { /* Ignore legacy browser cache. */ }
 
 const systems = window.dashboardData.systems;
 const stations = window.dashboardData.stations;
@@ -587,7 +582,7 @@ function showToast() {
   const toast = $("#toast"); toast.classList.add("show"); window.setTimeout(() => toast.classList.remove("show"), 2200);
 }
 
-async function importWorkbook(file) {
+async function importWorkbook(file, options = {}) {
   if (!window.XLSX) throw new Error("ตัวอ่านไฟล์ยังโหลดไม่เสร็จ");
   const workbook = XLSX.read(await file.arrayBuffer(), { type: "array", cellDates: true });
   const overview = XLSX.utils.sheet_to_json(workbook.Sheets.Overview, { header: 1, defval: "" });
@@ -618,10 +613,18 @@ async function importWorkbook(file) {
   window.dashboardData.summary = { reportDate: "ข้อมูลล่าสุดจากไฟล์", averageAvailability: availability.reduce((a, b) => a + b, 0) / availability.length, totalDowntime: downtime };
   window.dashboardData.source = file.name;
   window.dashboardData.systemStatusSchema = systemStatusSchema;
-  localStorage.setItem("dtrs-dashboard-data", JSON.stringify(window.dashboardData));
+
+  if (options.upload !== false) {
+    if (!window.usoShared?.saveWorkbook) throw new Error("ระบบบันทึกส่วนกลางยังไม่พร้อม");
+    await window.usoShared.saveWorkbook(file);
+  }
+
   rangeStart = null; rangeEnd = null;
-  renderSystems(); renderStations(); renderDateOptions(); renderDataSourceName(); renderDataSourceRange(); renderReport("daily"); showToast();
+  renderSystems(); renderStations(); renderDateOptions(); renderDataSourceName(); renderDataSourceRange(); renderReport("daily");
+  if (!options.silent) showToast();
 }
+
+window.importWorkbook = importWorkbook;
 
 $("#system-filter")?.addEventListener("change", () => { renderSystems(); drawChart(); renderPrintPreviewPageOne(); });
 $("#date-filter")?.addEventListener("click", openCalendar);
@@ -644,7 +647,10 @@ $("#station-status")?.addEventListener("change", renderStations);
 $$(".station-type").forEach((button) => button.addEventListener("click", () => { $$(".station-type").forEach((item) => item.classList.remove("active")); button.classList.add("active"); renderStations(); }));
 $$(".period-tab").forEach((button) => button.addEventListener("click", () => { rangeStart = null; rangeEnd = null; $$(".period-tab").forEach((item) => { item.classList.remove("active"); item.setAttribute("aria-selected", "false"); }); button.classList.add("active"); button.setAttribute("aria-selected", "true"); renderReport(button.dataset.period); }));
 $$("[data-scroll]").forEach((button) => button.addEventListener("click", () => $("#" + button.dataset.scroll)?.scrollIntoView({ behavior: "smooth" })));
-$("#refresh-button")?.addEventListener("click", showToast);
+$("#refresh-button")?.addEventListener("click", async () => {
+  if (window.usoShared?.refreshData) await window.usoShared.refreshData();
+  else showToast();
+});
 $("#print-report-nav")?.addEventListener("click", () => openPrintPreviewModal());
 $("#preview-modal-close")?.addEventListener("click", closePrintPreviewModal);
 $("#print-preview-modal")?.addEventListener("click", (event) => { if (event.target === event.currentTarget) closePrintPreviewModal(); });
@@ -690,13 +696,24 @@ $("#print-image-file")?.addEventListener("change", (event) => {
   }
   event.target.value = "";
 });
-$("#import-button")?.addEventListener("click", () => $("#import-file")?.click());
+$("#import-button")?.addEventListener("click", () => {
+  if (window.usoShared?.requestImport) window.usoShared.requestImport();
+  else $("#import-file")?.click();
+});
 $("#import-file")?.addEventListener("change", async (event) => {
   const button = $("#import-button");
   const file = event.target.files?.[0];
   if (!file) return;
   button.disabled = true;
-  try { await importWorkbook(file); } catch (error) { window.alert(error.message || "นำเข้าไฟล์ไม่สำเร็จ"); } finally { button.disabled = false; event.target.value = ""; }
+  try {
+    await importWorkbook(file, { upload: true });
+    window.dispatchEvent(new CustomEvent("uso-shared-workbook", { detail: { file } }));
+  } catch (error) {
+    window.alert(error.message || "นำเข้าไฟล์ไม่สำเร็จ");
+  } finally {
+    button.disabled = false;
+    event.target.value = "";
+  }
 });
 $("#dialog-close")?.addEventListener("click", () => $("#system-dialog")?.close());
 $("#system-dialog")?.addEventListener("click", (event) => { if (event.target === event.currentTarget) event.currentTarget.close(); });
