@@ -7,6 +7,7 @@
   let session = { authenticated: false, configured: false, registrationConfigured: false, username: null };
   let pendingImport = false;
   let loadingShared = false;
+  let latestVersion = null;
 
   async function api(path, options = {}) {
     const response = await fetch(path, {
@@ -133,14 +134,17 @@
     return file;
   }
 
-  async function loadSharedData({ silent = false } = {}) {
+  async function loadSharedData({ silent = false, onlyIfChanged = false } = {}) {
     if (loadingShared) return;
     loadingShared = true;
     try {
       const metaResponse = await fetch(LATEST_META + "?cb=" + Date.now(), { cache: "no-store" });
       if (metaResponse.ok) {
         const meta = await metaResponse.json();
+        const version = String(meta.version || meta.uploadedAt || meta.archivePath || "");
+        if (onlyIfChanged && latestVersion && version === latestVersion) return;
         await loadWorkbookFromUrl(rawUrl(meta.archivePath, meta.version), meta.originalFileName);
+        latestVersion = version;
         if (!silent) {
           const toast = q("#toast");
           if (toast) {
@@ -152,7 +156,9 @@
         return;
       }
       if (metaResponse.status !== 404) throw new Error("โหลด metadata ล่าสุดไม่สำเร็จ");
+      if (onlyIfChanged && latestVersion === "legacy") return;
       await loadWorkbookFromUrl(LEGACY_WORKBOOK + "?cb=" + Date.now(), "รายงานประจำวันชุมสาย v2.5.xlsx");
+      latestVersion = "legacy";
     } catch (error) {
       console.warn("Shared data:", error);
       if (!silent) window.alert(error.message || "ไม่สามารถโหลดข้อมูลกลางล่าสุดได้");
@@ -236,4 +242,8 @@
   bindAuthUI();
   refreshSession();
   window.setTimeout(() => loadSharedData({ silent: true }), 0);
+
+  // Keep already-open viewer screens in sync with the latest shared workbook.
+  window.setInterval(() => loadSharedData({ silent: true, onlyIfChanged: true }), 60000);
+  window.addEventListener("focus", () => loadSharedData({ silent: true, onlyIfChanged: true }));
 })();
