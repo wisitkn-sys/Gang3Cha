@@ -1,7 +1,12 @@
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 const systemStatusSchema = 3;
-try { localStorage.removeItem("dtrs-dashboard-data"); } catch { /* Ignore legacy browser cache. */ }
+try {
+  const storedData = JSON.parse(localStorage.getItem("dtrs-dashboard-data"));
+  if (storedData?.systemStatusSchema === systemStatusSchema) {
+    Object.assign(window.dashboardData, storedData);
+  }
+} catch { /* Keep bundled data when local fallback is unavailable. */ }
 
 const systems = window.dashboardData.systems;
 const stations = window.dashboardData.stations;
@@ -614,14 +619,34 @@ async function importWorkbook(file, options = {}) {
   window.dashboardData.source = file.name;
   window.dashboardData.systemStatusSchema = systemStatusSchema;
 
-  if (options.upload !== false) {
-    if (!window.usoShared?.saveWorkbook) throw new Error("ระบบบันทึกส่วนกลางยังไม่พร้อม");
-    await window.usoShared.saveWorkbook(file);
-  }
+  // Always keep the newest usable workbook data in this browser first.
+  // If Git/shared storage is unavailable, the dashboard can still show this latest import.
+  try {
+    localStorage.setItem("dtrs-dashboard-data", JSON.stringify(window.dashboardData));
+    localStorage.setItem("dtrs-dashboard-local-meta", JSON.stringify({
+      fileName: file.name,
+      savedAt: new Date().toISOString()
+    }));
+  } catch { /* Continue displaying the imported workbook even if browser storage is full. */ }
 
   rangeStart = null; rangeEnd = null;
   renderSystems(); renderStations(); renderDateOptions(); renderDataSourceName(); renderDataSourceRange(); renderReport("daily");
   if (!options.silent) showToast();
+
+  if (options.upload !== false) {
+    if (!window.usoShared?.saveWorkbook) {
+      const error = new Error("ระบบกลางไม่พร้อม ขณะนี้กำลังแสดงข้อมูลจากไฟล์ที่นำเข้าล่าสุดในเครื่องนี้");
+      error.localFallbackActive = true;
+      throw error;
+    }
+    try {
+      await window.usoShared.saveWorkbook(file);
+    } catch (cause) {
+      const error = new Error((cause?.message || "ไม่สามารถเชื่อมต่อ Git ได้") + " — กำลังแสดงข้อมูลจากไฟล์ที่นำเข้าล่าสุดในเครื่องนี้");
+      error.localFallbackActive = true;
+      throw error;
+    }
+  }
 }
 
 window.importWorkbook = importWorkbook;
@@ -709,7 +734,7 @@ $("#import-file")?.addEventListener("change", async (event) => {
     await importWorkbook(file, { upload: true });
     window.dispatchEvent(new CustomEvent("uso-shared-workbook", { detail: { file } }));
   } catch (error) {
-    window.alert(error.message || "นำเข้าไฟล์ไม่สำเร็จ");
+    window.alert(error.message || "บันทึกข้อมูลกลางไม่สำเร็จ แต่ยังแสดงข้อมูลจากไฟล์ที่นำเข้าล่าสุดในเครื่องนี้");
   } finally {
     button.disabled = false;
     event.target.value = "";
