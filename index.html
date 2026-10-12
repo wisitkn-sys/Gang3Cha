@@ -519,11 +519,49 @@
       </div>
     </div>
   </dialog>
+  <dialog class="uploader-auth-dialog" id="uploader-auth-dialog" aria-labelledby="uploader-auth-title">
+    <div class="dialog-head uploader-auth-head">
+      <div>
+        <p class="panel-kicker">DATA UPLOADER</p>
+        <h2 id="uploader-auth-title">เข้าสู่ระบบผู้บันทึกข้อมูล</h2>
+      </div>
+      <button class="dialog-close" id="uploader-auth-close" type="button" aria-label="ปิดหน้าต่าง">×</button>
+    </div>
+
+    <p class="uploader-auth-note">ผู้ดูสถานะสามารถใช้งาน Dashboard ได้ตามปกติโดยไม่ต้องเข้าสู่ระบบ</p>
+    <div class="uploader-auth-tabs" role="tablist" aria-label="เข้าสู่ระบบหรือลงทะเบียน">
+      <button type="button" class="active" data-auth-tab="login">เข้าสู่ระบบ</button>
+      <button type="button" data-auth-tab="register">ลงทะเบียนผู้บันทึก</button>
+    </div>
+
+    <form class="uploader-auth-form" id="uploader-login-form">
+      <label><span>Username</span><input name="username" autocomplete="username" required /></label>
+      <label><span>Password</span><input name="password" type="password" autocomplete="current-password" required /></label>
+      <button class="print-button primary-action uploader-auth-submit" type="submit">เข้าสู่ระบบ</button>
+    </form>
+
+    <form class="uploader-auth-form" id="uploader-register-form" hidden>
+      <label><span>Username</span><input name="username" autocomplete="username" minlength="3" maxlength="40" required /></label>
+      <label><span>Password</span><input name="password" type="password" autocomplete="new-password" minlength="10" required /></label>
+      <label><span>ยืนยัน Password</span><input name="confirmPassword" type="password" autocomplete="new-password" minlength="10" required /></label>
+      <label><span>รหัสลงทะเบียนผู้บันทึก</span><input name="registrationCode" type="password" autocomplete="off" required /></label>
+      <small>รหัสลงทะเบียนกำหนดโดยผู้ดูแลระบบ และไม่ใช่ Password ของผู้ใช้งาน</small>
+      <button class="print-button primary-action uploader-auth-submit" type="submit">สร้างบัญชีผู้บันทึก</button>
+    </form>
+
+    <div class="uploader-auth-footer">
+      <span id="uploader-auth-status">กำลังตรวจสอบสถานะ...</span>
+      <button class="uploader-logout" id="uploader-logout" type="button" hidden>ออกจากระบบ</button>
+    </div>
+    <p class="uploader-auth-message" id="uploader-auth-message" aria-live="polite"></p>
+  </dialog>
+
   <div class="toast" id="toast" role="status">อัปเดตข้อมูลล่าสุดแล้ว</div>
   <script src="./data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="./app.js"></script>
   <script src="./fixed-station.js"></script>
+  <script src="./shared-sync.js"></script>
 </body>
 
 </html>
