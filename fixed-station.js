@@ -354,6 +354,13 @@
     const parsed = parseFixedStationSheet(workbook);
     if (!parsed.length) return;
     fixedStations = parsed;
+    try {
+      localStorage.setItem("dtrs-fixed-stations", JSON.stringify({
+        version: 1,
+        savedAt: new Date().toISOString(),
+        rows: fixedStations
+      }));
+    } catch { /* Keep current in-memory Fixed Station data. */ }
     selectedProvinces.clear();
     renderProvincePanel();
     renderPrintFixedPage();
@@ -394,7 +401,17 @@
   createFixedStationUI();
   createPrintPageFour();
   createPreviewPageFour();
+
+  try {
+    const cachedFixed = JSON.parse(localStorage.getItem("dtrs-fixed-stations"));
+    if (cachedFixed?.version === 1 && Array.isArray(cachedFixed.rows) && cachedFixed.rows.length) {
+      fixedStations = cachedFixed.rows;
+    }
+  } catch { /* Keep empty Fixed Station data until shared data is available. */ }
+
   renderProvincePanel();
+  renderEnhancedStations();
+  renderPrintFixedPage();
 
   const importInput = q("#import-file");
   importInput?.addEventListener("change", (event) => {
