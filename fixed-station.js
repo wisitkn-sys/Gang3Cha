@@ -402,6 +402,11 @@
     if (file) parseFixedFromFile(file).catch((error) => console.warn("Fixed Station import:", error));
   });
 
+  window.addEventListener("uso-shared-workbook", (event) => {
+    const file = event.detail?.file;
+    if (file) parseFixedFromFile(file).catch((error) => console.warn("Fixed Station shared data:", error));
+  });
+
   window.addEventListener("beforeprint", renderPrintFixedPage);
-  loadLatestWorkbook();
+
 })();
